@@ -6,7 +6,8 @@ Create an account on the SEPIA server you want to develop for.
 Ask the admin to add the 'developer' role to the account (see [Wiki](https://github.com/SEPIA-Framework/sepia-docs/wiki/Create-and-Edit-Users) for help).
 
 ### Service upload interface
-SEPIA-Assist server, e.g.: http://localhost:20721/upload-service
+The SEPIA-Assist server has an endpoint for service uploads, e.g.: http://localhost:20721/upload-service  
+To use the interface make sure the server has SDK support enabled (via admin-tools or enable_sdk=true in assist.*.properties).
 
 ### Quickstart
 - Import the maven project into the IDE of your choice (tested with Eclipse).
