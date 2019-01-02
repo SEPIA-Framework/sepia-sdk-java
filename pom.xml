@@ -23,15 +23,15 @@
   </properties>
   
   <dependencies>
-        <!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH ;-) 
+        <!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH ;-) --> 
         <dependency>
             <groupId>net.b07z.sepia.server.assist</groupId>
 			<artifactId>sepia-assist-API</artifactId>
             <version>2.1.5</version>
         </dependency> 
-        -->
         
         <!-- THIS IS WHAT WE USE FOR NOW -->
+        <!--
 	    <dependency>
 	  		<groupId>com.sparkjava</groupId>
 	  		<artifactId>spark-core</artifactId>
@@ -120,6 +120,7 @@
   			<scope>system</scope>
   			<systemPath>${basedir}/libs/sepia-assist-v2.1.5.jar</systemPath>
 		</dependency>
+		-->
 		
 		<!-- Java Docs / not really working, need to define via IDE -->
 		<dependency>

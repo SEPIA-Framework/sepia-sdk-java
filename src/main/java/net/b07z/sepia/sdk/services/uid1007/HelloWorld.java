@@ -35,11 +35,11 @@ public class HelloWorld implements ServiceInterface{
 		TreeSet<String> samples = new TreeSet<>();
 		//GERMAN
 		if (lang.equals(Language.DE.toValue())){
-			samples.add("Hello world!");
+			samples.add("Hallo Welt!");
 			
 		//OTHER
 		}else{
-			samples.add("Hallo Welt!");
+			samples.add("Hello world!");
 		}
 		return samples;
 	}
