@@ -59,15 +59,15 @@ public class LocalTests {
 		if (text == null) {
 			text = service.getSampleSentences(languageCode).first();
 		}
-		
-		//Get Fake input
-		NluInput input = ConfigTestServer.getFakeInput(text, languageCode);
-		log.info("Input Text: " + text);
-		
 		//Get normalized input
 		String normText = normalize(text, languageCode);
-		log.info("Norm. Text: " + normText);
+		log.info("Input text: " + text);
+		log.info("Norm. text: " + normText);
 		
+		//Get Fake input
+		NluInput input = ConfigTestServer.getFakeInput(normText, languageCode);
+		input.textRaw = text;
+
 		//Use the regular-expression interpreter
 		
 		List<String> possibleCMDs = new ArrayList<>();			//make a list of possible interpretations of the text
