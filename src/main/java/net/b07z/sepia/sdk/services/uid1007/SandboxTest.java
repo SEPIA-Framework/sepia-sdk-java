@@ -30,6 +30,14 @@ public class SandboxTest implements ServiceInterface{
 
 	//Command name
 	private static final String CMD_NAME = "sand_box_test";
+	
+	/**
+	 * Only for testing: A method to get the intended command name ... since getInfo might not work in this class ;-) 
+	 */
+	public static String getCmdName(){
+		return Sdk.getMyCommandName(new SandboxTest(), CMD_NAME);
+	}
+	
 	//Answers used:
 	private static final String successAnswer = "<direct>Sandbox test was successful.";
 	private static final String errorAnswer = "<direct>It seems the sandbox test crashed with an internal error.";

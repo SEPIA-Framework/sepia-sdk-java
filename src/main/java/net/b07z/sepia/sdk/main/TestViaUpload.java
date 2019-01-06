@@ -25,14 +25,18 @@ public class TestViaUpload {
         String testSentence = null; 	//we use the ones included in the service
         
         //Upload (and test)
-        log.info("\n");
-        log.info("Testing service 1:\n");
-        UploadService.transfer(service, language, testSentence);
+        log.info("");
+        log.info("Testing service 1:");
+        log.info("");
+        //UploadService.transferClassFile(service, language, testSentence);
+        UploadService.transferJavaFile(service, language, testSentence);
         
         //2nd test
-        log.info("\n");
-        log.info("Testing service 2:\n");
+        log.info("");
+        log.info("Testing service 2:");
+        log.info("");
         service = new SandboxTest();
-        UploadService.transfer(service, language, testSentence);
+        //UploadService.transferClassFile(service, language, testSentence);
+        UploadService.transferJavaFile(service, language, testSentence);
     }
 }

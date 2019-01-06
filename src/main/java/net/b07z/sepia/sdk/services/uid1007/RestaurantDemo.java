@@ -16,7 +16,6 @@ import net.b07z.sepia.server.assist.services.ServiceInterface;
 import net.b07z.sepia.server.assist.services.ServiceResult;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Content;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Type;
-import net.b07z.sepia.server.core.assistant.ACTIONS;
 import net.b07z.sepia.server.core.assistant.PARAMETERS;
 import net.b07z.sepia.server.core.data.Language;
 import net.b07z.sepia.server.core.tools.Debugger;
@@ -123,12 +122,7 @@ public class RestaurantDemo implements ServiceInterface{
 		//NONE
 		
 		//This service basically cannot fail ... ;-)
-		
-		//Just for demo purposes we add a button-action with a link to the SDK
-		api.addAction(ACTIONS.BUTTON_IN_APP_BROWSER);
-		api.putActionInfo("url", "https://github.com/SEPIA-Framework/sepia-sdk-java");
-		api.putActionInfo("title", "SDK info");
-		
+				
 		//all good
 		api.setStatusSuccess();
 		
@@ -142,7 +136,7 @@ public class RestaurantDemo implements ServiceInterface{
 	/**
 	 * Parameter handler that tries to extract a reservation name.
 	 */
-	public class ReservationName extends CustomParameter {
+	public static class ReservationName extends CustomParameter {
 
 		@Override
 		public String extract(String input) {
