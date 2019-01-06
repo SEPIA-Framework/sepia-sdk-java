@@ -3,7 +3,7 @@
   
   <groupId>net.b07z.sepia.sdk</groupId>
   <artifactId>sepia-sdk-java</artifactId>
-  <version>0.9.0</version>
+  <version>0.9.9</version>
   <name>SEPIA SDK</name>
   <description>Tools to develop services for the SEPIA framework</description>
   <url>https://sepia-framework.github.io</url>
@@ -23,15 +23,15 @@
   </properties>
   
   <dependencies>
-        <!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH ;-) --> 
+        <!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH OR LOCALLY INSTALLED ... 
         <dependency>
             <groupId>net.b07z.sepia.server.assist</groupId>
 			<artifactId>sepia-assist-API</artifactId>
-            <version>2.1.5</version>
+            <version>2.2.0</version>
         </dependency> 
+        -->
         
-        <!-- THIS IS WHAT WE USE FOR NOW -->
-        <!--
+        <!-- ... THIS IS WHAT WE USE FOR NOW -->
 	    <dependency>
 	  		<groupId>com.sparkjava</groupId>
 	  		<artifactId>spark-core</artifactId>
@@ -116,13 +116,13 @@
 		<dependency>
   			<groupId>net.b07z.sepia.server.assist</groupId>
 			<artifactId>sepia-assist-API</artifactId>
-			<version>2.1.5</version>
+			<version>2.2.0</version>
   			<scope>system</scope>
-  			<systemPath>${basedir}/libs/sepia-assist-v2.1.5.jar</systemPath>
+  			<systemPath>${basedir}/libs/sepia-assist-v2.2.0.jar</systemPath>
 		</dependency>
-		-->
+		<!-- -->
 		
-		<!-- Java Docs / not really working, need to define via IDE -->
+		<!-- Java Docs / not really working, need to load manually via IDE -->
 		<dependency>
   			<groupId>net.b07z.sepia.server.core</groupId>
   			<artifactId>sepia-core-tools</artifactId>
@@ -134,10 +134,10 @@
 		<dependency>
   			<groupId>net.b07z.sepia.server.assist</groupId>
 			<artifactId>sepia-assist-API</artifactId>
-			<version>2.1.5</version>
+			<version>2.2.0</version>
 			<classifier>javadoc</classifier>
   			<scope>system</scope>
-  			<systemPath>${basedir}/libs/sepia-assist-v2.1.5-javadoc.jar</systemPath>
+  			<systemPath>${basedir}/libs/sepia-assist-v2.2.0-javadoc.jar</systemPath>
 		</dependency>
 		
 		<!-- JUnit -->

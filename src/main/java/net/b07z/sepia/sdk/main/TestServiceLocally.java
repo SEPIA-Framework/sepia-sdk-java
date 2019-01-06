@@ -20,10 +20,20 @@ import net.b07z.sepia.server.assist.server.ConfigTestServer;
 import net.b07z.sepia.server.assist.services.ServiceInterface;
 import net.b07z.sepia.server.core.tools.JSONWriter;
 
-public class LocalTests {
+/**
+ * Demonstrates how to test a service locally before using the upload function.
+ * 
+ * @author Florian Quirin
+ *
+ */
+public class TestServiceLocally {
 	
-	private static final Logger log = LoggerFactory.getLogger(LocalTests.class);
+	private static final Logger log = LoggerFactory.getLogger(TestServiceLocally.class);
 
+	/**
+	 * Write your own tests here or use this as an example.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		
 		//Test this service
@@ -39,7 +49,10 @@ public class LocalTests {
 		log.info(JSONWriter.getPrettyString(result.getBestResultJSON()));
 	}
 	
-	private static void setup() {
+	/**
+	 * Setup some components of SEPIA.
+	 */
+	public static void setup() {
 		//setup answers
 		//Config.setAnswerModule(new AnswerLoaderFile()); 	//choose txt-file answers-module
 		//DefaultReplies.setupDefaults(); 	//setup default question mapping for parameters and stuff
@@ -49,12 +62,13 @@ public class LocalTests {
 		ParameterConfig.setup(); 			//connect parameter names to handlers and other stuff
 	}
 	
-	private static String normalize(String text, String languageCode) {
-		Normalizer normalizer = Config.inputNormalizers.get(languageCode);
-		String normText = normalizer.normalizeText(text);
-		return normText;
-	}
-	
+	/**
+	 * Test a custom service that has a regular-expression trigger.
+	 * @param service - service to test
+	 * @param text - original input text (not normalized)
+	 * @param languageCode - language code of text input (e.g. LANGUAGES.EN)
+	 * @return
+	 */
 	public static NluResult testServiceWithRegExpTrigger(ServiceInterface service, String text, String languageCode) {
 		if (text == null) {
 			text = service.getSampleSentences(languageCode).first();
@@ -83,6 +97,15 @@ public class LocalTests {
 		log.info("Primary score: " + possibleScore.get(bestScoreIndex));
 		NluResult result = new NluResult(possibleCMDs, possibleParameters, possibleScore, bestScoreIndex);
 		return result;
+	}
+	
+	/**
+	 * Normalize text. Resembles server behavior.
+	 */
+	private static String normalize(String text, String languageCode) {
+		Normalizer normalizer = Config.inputNormalizers.get(languageCode);
+		String normText = normalizer.normalizeText(text);
+		return normText;
 	}
 
 }

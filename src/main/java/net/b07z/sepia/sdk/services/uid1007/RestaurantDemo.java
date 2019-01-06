@@ -8,12 +8,15 @@ import net.b07z.sepia.server.assist.assistant.LANGUAGES;
 import net.b07z.sepia.server.assist.data.Parameter;
 import net.b07z.sepia.server.assist.interpreters.NluResult;
 import net.b07z.sepia.server.assist.interpreters.NluTools;
+import net.b07z.sepia.server.assist.interpreters.Normalizer;
+import net.b07z.sepia.server.assist.interpreters.NormalizerLight;
 import net.b07z.sepia.server.assist.interviews.InterviewData;
 import net.b07z.sepia.server.assist.parameters.CustomParameter;
 import net.b07z.sepia.server.assist.services.ServiceBuilder;
 import net.b07z.sepia.server.assist.services.ServiceInfo;
 import net.b07z.sepia.server.assist.services.ServiceInterface;
 import net.b07z.sepia.server.assist.services.ServiceResult;
+import net.b07z.sepia.server.assist.tools.DateTimeConverters;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Content;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Type;
 import net.b07z.sepia.server.core.assistant.PARAMETERS;
@@ -35,8 +38,10 @@ public class RestaurantDemo implements ServiceInterface{
 	
 	//Answers and questions used
 	//NOTE: Since we only support English in this service and it's a demo we use <direct> sentences instead of links to the database.
-	//		This is okay for development but has some disadvantages like there will be no variation on questions after a repeat ("sorry?" -> "sorry once more plz?" ...).
-	private static final String successAnswer = "<direct>Ok, I've reserved a table at <1> for <2> people on the name <3>. Thank you and have a great meal.";
+	//		This is okay for development but has some disadvantages like there will be no variation on questions after a repeat 
+	//		("sorry?" -> "sorry once more plz?" ...).
+	private static final String successAnswer = "<direct>Ok, I've reserved a table for the <1> o'clock for <2> people on the name <3>. "
+												+ "Thank you and have a great meal.";
 	private static final String okAnswer = "<direct>Sorry I could not reserve a table. Please try again later.";
 	private static final String failAnswer = "error_0a";
 	private static final String askTimeAndDate = "<direct>When would you like to visit Luigis?";
@@ -108,6 +113,10 @@ public class RestaurantDemo implements ServiceInterface{
 			.addFailAnswer(failAnswer)
 			.addOkayAnswer(okAnswer);
 		
+		//Add answer parameters that are used to replace <1>, <2>, ... in your answers.
+		//The name is arbitrary but you need to use the same one in getResult(...) later for api.resultInfoPut(...)
+		info.addAnswerParameters("time", "number", "name"); 	//<1>=time, <2>=number, ...
+		
 		return info;
 	}
 	
@@ -116,12 +125,34 @@ public class RestaurantDemo implements ServiceInterface{
 		//initialize result
 		ServiceBuilder api = new ServiceBuilder(nluResult, getInfo(nluResult.language));
 		
-		//get required parameters
-		//NONE
+		//get required parameters:
+		
+		//-date and time
+		Parameter dateTimeParameter = nluResult.getRequiredParameter(PARAMETERS.TIME);
+		String day = (String) dateTimeParameter.getDataFieldOrDefault(InterviewData.DATE_DAY);
+		String time = (String) dateTimeParameter.getDataFieldOrDefault(InterviewData.DATE_TIME);
+		//Some cosmetics (Note: this is language dependent and should be handled with more care in a real service! ;-))
+		String timeDate = DateTimeConverters.getSpeakableDate(day, "yyyy.MM.dd", api.language)
+				+ " at " + DateTimeConverters.convertDateFormat(time, "HH:mm:ss", "h:mm");
+		
+		//-number
+		Parameter numberParameter = nluResult.getRequiredParameter(PARAMETERS.NUMBER);
+		String number = numberParameter.getValueAsString();
+		
+		//-name - NOTE: custom parameter has different naming
+		Parameter nameParameter = nluResult.getRequiredParameter(ReservationName.class.getName());
+		String name = nameParameter.getValueAsString();
+		
 		//get optional parameters
 		//NONE
 		
+		//Set answer parameters as defined in getInfo():
+		api.resultInfoPut("time", timeDate);
+		api.resultInfoPut("number", number);
+		api.resultInfoPut("name", name);
+		
 		//This service basically cannot fail ... ;-)
+		// ... here you would call your reservation method/API/program ...
 				
 		//all good
 		api.setStatusSuccess();
@@ -151,6 +182,12 @@ public class RestaurantDemo implements ServiceInterface{
 			//Other languages
 			}else{
 				Debugger.println("Custom parameter 'ReservationName' does not support language: " + this.language, 1);
+			}
+			
+			//Reconstruct original text format (before normalization) - This is just a cosmetic change
+			if (!extracted.isEmpty()){
+				Normalizer normalizer = new NormalizerLight();
+				extracted = normalizer.reconstructPhrase(nluInput.textRaw, extracted);
 			}
 			return extracted;
 		}
