@@ -12,11 +12,13 @@ import net.b07z.sepia.server.assist.interpreters.Normalizer;
 import net.b07z.sepia.server.assist.interpreters.NormalizerLight;
 import net.b07z.sepia.server.assist.interviews.InterviewData;
 import net.b07z.sepia.server.assist.parameters.CustomParameter;
+import net.b07z.sepia.server.assist.services.ServiceAccessManager;
 import net.b07z.sepia.server.assist.services.ServiceBuilder;
 import net.b07z.sepia.server.assist.services.ServiceInfo;
 import net.b07z.sepia.server.assist.services.ServiceInterface;
 import net.b07z.sepia.server.assist.services.ServiceResult;
 import net.b07z.sepia.server.assist.tools.DateTimeConverters;
+import net.b07z.sepia.server.assist.users.ACCOUNT;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Content;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Type;
 import net.b07z.sepia.server.core.assistant.PARAMETERS;
@@ -40,11 +42,12 @@ public class RestaurantDemo implements ServiceInterface{
 	//NOTE: Since we only support English in this service and it's a demo we use <direct> sentences instead of links to the database.
 	//		This is okay for development but has some disadvantages like there will be no variation on questions after a repeat 
 	//		("sorry?" -> "sorry once more plz?" ...).
-	private static final String successAnswer = "<direct>Ok, I've reserved a table for the <1> o'clock for <2> people on the name <3>. "
+	private static final String successAnswer = "<direct>Ok, I've reserved a table for the <1> for <2> people on the name <3>. "
 												+ "Thank you and have a great meal.";
 	private static final String okAnswer = "<direct>Sorry I could not reserve a table. Please try again later.";
 	private static final String failAnswer = "error_0a";
 	private static final String askTimeAndDate = "<direct>When would you like to visit Luigis?";
+	private static final String askTimeAndDateMoreSpecific = "<direct>Sorry can you tell me the date and time of your visit again? I think I missed one of them.";
 	private static final String askNumberOfPersons = "<direct>How many people will come?";
 	private static final String askReservationName = "<direct>On what name should I reserve the table?";
 	
@@ -85,8 +88,8 @@ public class RestaurantDemo implements ServiceInterface{
 		*/
 		
 		//Regular expression triggers:
-		info.setCustomTriggerRegX(".*\\b((reserve|book) a table)\\b.*", EN);
-		//info.setCustomTriggerRegXscoreBoost(2);		//boost service to make it hard to overrule
+		info.setCustomTriggerRegX(".*\\b((reserve|book)\\b.* table)\\b.*", EN);
+		info.setCustomTriggerRegXscoreBoost(5);		//boost service a bit to increase priority over similar ones
 		
 		//Parameters:
 		
@@ -131,9 +134,21 @@ public class RestaurantDemo implements ServiceInterface{
 		Parameter dateTimeParameter = nluResult.getRequiredParameter(PARAMETERS.TIME);
 		String day = (String) dateTimeParameter.getDataFieldOrDefault(InterviewData.DATE_DAY);
 		String time = (String) dateTimeParameter.getDataFieldOrDefault(InterviewData.DATE_TIME);
-		//Some cosmetics (Note: this is language dependent and should be handled with more care in a real service! ;-))
-		String timeDate = DateTimeConverters.getSpeakableDate(day, "yyyy.MM.dd", api.language)
-				+ " at " + DateTimeConverters.convertDateFormat(time, "HH:mm:ss", "h:mm");
+		
+		//in this scenario we can get a time AND date or JUST ONE of them - (check Alarm service for more elegant handling)
+		if (day.isEmpty() || time.isEmpty()){
+			//abort with question
+			api.setIncompleteAndAsk(PARAMETERS.TIME, askTimeAndDateMoreSpecific);
+			ServiceResult result = api.buildResult();
+			return result;
+		}
+		
+		//some cosmetics (Note: this is language dependent and should be handled with more care in a real service! ;-))
+		String timeDate = day + " " + time;
+		if (api.language.equals(LANGUAGES.EN)){
+			timeDate = DateTimeConverters.getSpeakableDate(day, "yyyy.MM.dd", api.language)
+				+ " at " + DateTimeConverters.convertDateFormat(time, "HH:mm:ss", "h:mm a");
+		}
 		
 		//-number
 		Parameter numberParameter = nluResult.getRequiredParameter(PARAMETERS.NUMBER);
@@ -175,9 +190,21 @@ public class RestaurantDemo implements ServiceInterface{
 			
 			//English
 			if (this.language.equals(LANGUAGES.EN)){
-				extracted = NluTools.stringFindFirst(input, "(name .*)");
+				extracted = NluTools.stringFindFirst(input, "(my name|my$|name .*)");
 				extracted = extracted.replaceAll("\\b(at|for)\\b.*", "").trim();
 				extracted = extracted.replaceAll("\\b(name|is|a|the)\\b", "").trim();
+				
+				//check some specials and access account if allowed
+				if (extracted.equals("my")){
+					//access account
+					ServiceAccessManager sam = new ServiceAccessManager("demoKey");
+					if (sam.isAllowedToAccess(ACCOUNT.USER_NAME_LAST)){
+						extracted = nluInput.user.getName(sam);
+					}else{
+						//refuse and ask again - a real service should handle this with a more specific follow-up question
+						extracted = "<user_data_unresolved>"; 
+					}
+				}
 			
 			//Other languages
 			}else{
@@ -191,14 +218,29 @@ public class RestaurantDemo implements ServiceInterface{
 			}
 			return extracted;
 		}
+		
+		@Override
+		public String responseTweaker(String input){
+			if (language.equals(LANGUAGES.EN)){
+				return input.replaceAll(".*(for |on |the |name )", "").trim();
+			}else{
+				Debugger.println("Custom parameter 'ReservationName' does not support language: " + this.language, 1);
+				return input;
+			}
+		}
 
 		@Override
-		public String build(String input) {
-			//build result with entry for field "VALUE"
-			JSONObject itemResultJSON = JSON.make(InterviewData.VALUE, input);
-
-			this.buildSuccess = true;
-			return itemResultJSON.toJSONString();
+		public String build(String input){
+			//any errors?
+			if (input.equals("<user_data_unresolved>")){
+				this.buildSuccess = false;
+				return ""; 		//TODO: this probably should become something like 'Interview.ERROR_USER_DATA_ACCESS' in the future;
+			}else{
+				//build result with entry for field "VALUE"
+				JSONObject itemResultJSON = JSON.make(InterviewData.VALUE, input);
+				this.buildSuccess = true;
+				return itemResultJSON.toJSONString();
+			}
 		}		
 	}
 
