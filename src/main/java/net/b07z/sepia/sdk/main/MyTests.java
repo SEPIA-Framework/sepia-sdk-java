@@ -21,7 +21,7 @@ public class MyTests {
 		//Define class, language and sentence (optional)
         ServiceInterface service = new RestaurantDemo();
         Language language = Language.EN;
-        String testSentence = "reserve a table for 2"; 	//we use the ones included in the service
+        String testSentence = null; //"reserve a table for 2"; 	//we use the ones included in the service
         
         //Upload
         log.info("");

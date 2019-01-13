@@ -2,6 +2,10 @@ package net.b07z.sepia.sdk.services.uid1007;
 
 import java.util.TreeSet;
 
+import org.json.simple.JSONObject;
+
+import net.b07z.sepia.server.assist.data.Card;
+import net.b07z.sepia.server.assist.data.Card.ElementType;
 import net.b07z.sepia.server.assist.interpreters.NluResult;
 import net.b07z.sepia.server.assist.services.ServiceBuilder;
 import net.b07z.sepia.server.assist.services.ServiceInfo;
@@ -11,10 +15,12 @@ import net.b07z.sepia.server.assist.services.ServiceInfo.Content;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Type;
 import net.b07z.sepia.server.core.assistant.ACTIONS;
 import net.b07z.sepia.server.core.data.Language;
+import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.Sdk;
 
 /**
- * "Hello World" custom service that just returns a "Hello" answer and a button that links to the SDK.
+ * "Hello World" custom service that just returns a "Hello" answer, 
+ * a demo button that links to the SDK and a demo card that links to SEPIA website.
  * 
  * @author Florian Quirin
  *
@@ -80,7 +86,8 @@ public class HelloWorld implements ServiceInterface{
 	@Override
 	public ServiceResult getResult(NluResult nluResult) {
 		//initialize result
-		ServiceBuilder api = new ServiceBuilder(nluResult, getInfo(nluResult.language));
+		ServiceBuilder api = new ServiceBuilder(nluResult, 
+				getInfoFreshOrCache(nluResult.input, this.getClass().getCanonicalName()));
 		
 		//get required parameters
 		//NONE
@@ -93,6 +100,19 @@ public class HelloWorld implements ServiceInterface{
 		api.addAction(ACTIONS.BUTTON_IN_APP_BROWSER);
 		api.putActionInfo("url", "https://github.com/SEPIA-Framework/sepia-sdk-java");
 		api.putActionInfo("title", "SDK info");
+		
+		//... and we also add a demo card
+		Card card = new Card(Card.TYPE_SINGLE);
+		JSONObject linkCard = card.addElement(
+				ElementType.link, 
+				JSON.make("title", "S.E.P.I.A." + ":", "desc", "Hello World!"),
+				null, null, "", 
+				"https://sepia-framework.github.io/", 
+				"https://sepia-framework.github.io/img/icon.png", 
+				null, null
+		);
+		JSON.put(linkCard, "imageBackground", "#000");	//more options like CSS background
+		api.addCard(card.getJSON());
 		
 		//all good
 		api.setStatusSuccess();

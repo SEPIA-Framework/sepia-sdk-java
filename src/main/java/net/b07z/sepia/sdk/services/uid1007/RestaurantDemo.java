@@ -4,6 +4,7 @@ import java.util.TreeSet;
 
 import org.json.simple.JSONObject;
 
+import net.b07z.sepia.server.assist.answers.ServiceAnswers;
 import net.b07z.sepia.server.assist.assistant.LANGUAGES;
 import net.b07z.sepia.server.assist.data.Parameter;
 import net.b07z.sepia.server.assist.interpreters.NluResult;
@@ -22,6 +23,7 @@ import net.b07z.sepia.server.assist.users.ACCOUNT;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Content;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Type;
 import net.b07z.sepia.server.core.assistant.PARAMETERS;
+import net.b07z.sepia.server.core.data.Answer;
 import net.b07z.sepia.server.core.data.Language;
 import net.b07z.sepia.server.core.tools.Debugger;
 import net.b07z.sepia.server.core.tools.JSON;
@@ -33,28 +35,15 @@ import net.b07z.sepia.server.core.tools.Sdk;
  * @author Florian Quirin
  *
  */
-public class RestaurantDemo implements ServiceInterface{
+public class RestaurantDemo implements ServiceInterface {
 	
-	//Command name
-	private static final String CMD_NAME = "restaurant_reservation";	//Name tag of your service (will be combined with userId to be unique)
-	
-	//Answers and questions used
-	//NOTE: Since we only support English in this service and it's a demo we use <direct> sentences instead of links to the database.
-	//		This is okay for development but has some disadvantages like there will be no variation on questions after a repeat 
-	//		("sorry?" -> "sorry once more plz?" ...).
-	private static final String successAnswer = "<direct>Ok, I've reserved a table for the <1> for <2> people on the name <3>. "
-												+ "Thank you and have a great meal.";
-	private static final String okAnswer = "<direct>Sorry I could not reserve a table. Please try again later.";
-	private static final String failAnswer = "error_0a";
-	private static final String askTimeAndDate = "<direct>When would you like to visit Luigis?";
-	private static final String askTimeAndDateMoreSpecific = "<direct>Sorry can you tell me the date and time of your visit again? I think I missed one of them.";
-	private static final String askNumberOfPersons = "<direct>How many people will come?";
-	private static final String askReservationName = "<direct>On what name should I reserve the table?";
+	//Command name of your service (will be combined with userId to be unique)
+	private static final String CMD_NAME = "restaurant_reservation";
 	
 	//Define some sentences for testing:
 	
 	@Override
-	public TreeSet<String> getSampleSentences(String lang){
+	public TreeSet<String> getSampleSentences(String lang) {
 		TreeSet<String> samples = new TreeSet<>();
 		//GERMAN
 		if (lang.equals(Language.DE.toValue())){
@@ -67,6 +56,60 @@ public class RestaurantDemo implements ServiceInterface{
 	}
 	
 	//Basic service setup:
+	
+	//Overriding the 'getAnswersPool' methods enables you to define custom answers with more complex features.
+	//You can build a pool of answers that can have multiple versions of the same answer used for different 
+	//situations like a repeated question (what was the time? -> sorry say again, what was the time? -> ...).
+
+	@Override
+	public ServiceAnswers getAnswersPool(String language) {
+		ServiceAnswers answerPool = new ServiceAnswers(language);
+		
+		//Build English answers
+		if (language.equals(LANGUAGES.EN)){
+			answerPool
+				.addAnswer(successAnswer, 0, "Ok, I've reserved a table for the <1> for <2> people on the name <3>. " 
+								+ "Thank you and have a great meal.")
+								//example of how to use the 'shortcut' to add an answer
+				
+				.addAnswer(okAnswer, 0, "Sorry I could not reserve a table. Please try again later.")
+				
+				.addAnswer(askTimeAndDate, 0, "When would you like to visit Luigis?")
+				.addAnswer(askTimeAndDate, 1, "Sorry say again please. At what day and time would you like to visit Luigis?")
+				.addAnswer(askTimeAndDate, 2, "Sorry I still didn't get it. What is the time and date of your visit?")
+				
+				.addAnswer(askTimeAndDateMoreSpecific, 0, "Sorry can you tell me the date and time of your visit again? " 
+								+ "I think I missed one of them.")
+				.addAnswer(askTimeAndDateMoreSpecific, 1, "Sorry say again please?")
+				.addAnswer(askTimeAndDateMoreSpecific, 2, "Sorry it looks like I've troubles understanding the date and time. "
+								+ "Try once more please.")
+				
+				.addAnswer(askNumberOfPersons, 0, "How many people will come?")
+				.addAnswer(askNumberOfPersons, 1, "Sorry, how many people did you say will come?")
+				.addAnswer(askNumberOfPersons, 2, "Sorry but I still did not get it. What is the number of people?")
+				
+				.addAnswer(askReservationName, 0, "On what name should I reserve the table?")
+				.addAnswer(askReservationName, 1, "Sorry can you give me the name again please?")
+				.addAnswer(new Answer(Language.from(language), askReservationName, "Sorry I did not understant the name for "
+								+ "your reservation. Can you tell me once more please?", 
+						Answer.Character.neutral, 2, 5)) 		
+						//example of how to use the 'complete' answer object
+				;
+			return answerPool;
+		
+		//Other languages not yet supported
+		}else{
+			return null;
+		}
+	}
+	//We keep a reference here for easy access in getResult - Note that custom answers need to start with a certain prefix
+	private static final String failAnswer = "error_0a";
+	private static final String successAnswer = ServiceAnswers.ANS_PREFIX + "restaurant_success_0a";
+	private static final String okAnswer = ServiceAnswers.ANS_PREFIX + "restaurant_still_ok_0a";
+	private static final String askTimeAndDate = ServiceAnswers.ANS_PREFIX + "restaurant_ask_time_date_1a";
+	private static final String askTimeAndDateMoreSpecific = ServiceAnswers.ANS_PREFIX + "restaurant_ask_time_date_1b";
+	private static final String askNumberOfPersons = ServiceAnswers.ANS_PREFIX + "restaurant_ask_num_persons_2a";
+	private static final String askReservationName = ServiceAnswers.ANS_PREFIX + "restaurant_ask_res_name_3a";
 
 	@Override
 	public ServiceInfo getInfo(String language) {
@@ -99,7 +142,8 @@ public class RestaurantDemo implements ServiceInterface{
 		//The first 2 are already available by default:
 		Parameter p1 = new Parameter(PARAMETERS.TIME)
 				.setRequired(true)
-				.setQuestion(askTimeAndDate); 				//NOTE: if you are looking for TIME and NUMBER use this parameter first to exclude dates in NUMBER
+				.setQuestion(askTimeAndDate); 				
+				//NOTE: if you are looking for TIME and NUMBER use this parameter first to exclude dates in NUMBER
 		Parameter p2 = new Parameter(PARAMETERS.NUMBER)
 				.setRequired(true)
 				.setQuestion(askNumberOfPersons);
@@ -111,10 +155,12 @@ public class RestaurantDemo implements ServiceInterface{
 		
 		info.addParameter(p1).addParameter(p2).addParameter(p3);
 		
-		//Answers (these are the default answers, you can trigger a custom answer at any point in the module with api.setCustomAnswer(..)):
+		//Answers (these are the default answers, you can trigger a custom answer at any point in the module 
+		//with serviceBuilder.setCustomAnswer(..)):
 		info.addSuccessAnswer(successAnswer)
 			.addFailAnswer(failAnswer)
 			.addOkayAnswer(okAnswer);
+			//.addCustomAnswer("askTimeAndDate", askTimeAndDate); 	//optional, just for info
 		
 		//Add answer parameters that are used to replace <1>, <2>, ... in your answers.
 		//The name is arbitrary but you need to use the same one in getResult(...) later for api.resultInfoPut(...)
@@ -126,7 +172,9 @@ public class RestaurantDemo implements ServiceInterface{
 	@Override
 	public ServiceResult getResult(NluResult nluResult) {
 		//initialize result
-		ServiceBuilder api = new ServiceBuilder(nluResult, getInfo(nluResult.language));
+		ServiceBuilder api = new ServiceBuilder(nluResult, 
+				getInfoFreshOrCache(nluResult.input, this.getClass().getCanonicalName()),
+				getAnswersPool(nluResult.language));
 		
 		//get required parameters:
 		
@@ -231,8 +279,11 @@ public class RestaurantDemo implements ServiceInterface{
 
 		@Override
 		public String build(String input){
+			//anything extracted?
+			if (input.isEmpty()){
+				return "";			
 			//any errors?
-			if (input.equals("<user_data_unresolved>")){
+			}else if (input.equals("<user_data_unresolved>")){
 				this.buildSuccess = false;
 				return ""; 		//TODO: this probably should become something like 'Interview.ERROR_USER_DATA_ACCESS' in the future;
 			}else{
