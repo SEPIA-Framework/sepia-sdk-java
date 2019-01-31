@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>net.b07z.sepia.sdk</groupId>
+  <artifactId>sepia-sdk-java</artifactId>
+  <version>0.9.9</version>
+  <name>SEPIA SDK</name>
+  <description>Tools to develop services for the SEPIA framework</description>
+  <url>https://sepia-framework.github.io</url>
+  <packaging>jar</packaging>
+  
+  <licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+  </licenses>
+  
+  <properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+  
+  <dependencies>
+        <!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH OR LOCALLY INSTALLED ... 
+        <dependency>
+            <groupId>net.b07z.sepia.server.assist</groupId>
+			<artifactId>sepia-assist-API</artifactId>
+            <version>2.2.0</version>
+        </dependency> 
+        -->
+        
+        <!-- ... THIS IS WHAT WE USE FOR NOW -->
+	    <dependency>
+	  		<groupId>com.sparkjava</groupId>
+	  		<artifactId>spark-core</artifactId>
+	  		<version>2.8.0</version>
+	  	</dependency>
+		<dependency>
+	        <groupId>org.slf4j</groupId>
+	        <artifactId>slf4j-simple</artifactId>
+	        <version>1.7.21</version>
+	    </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.7</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+  			<groupId>commons-codec</groupId>
+  			<artifactId>commons-codec</artifactId>
+  			<version>1.10</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.googlecode.soundlibs</groupId>
+  			<artifactId>mp3spi</artifactId>
+  			<version>1.9.5-1</version>
+  		</dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+        <dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.5.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpmime</artifactId>
+		    <version>4.5.3</version>
+		</dependency>
+		<dependency>
+  			<groupId>net.b07z.sepia.server.core</groupId>
+  			<artifactId>sepia-core-tools</artifactId>
+  			<version>2.2.0</version>
+  			<scope>system</scope>
+  			<systemPath>${basedir}/libs/sepia-core-tools-v2.2.0.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+            <groupId>com.j2html</groupId>
+            <artifactId>j2html</artifactId>
+            <version>0.88</version>
+        </dependency>
+		<dependency>
+  			<groupId>net.b07z.sepia.websockets</groupId>
+			<artifactId>sepia-websockets</artifactId>
+			<version>1.1.0</version>
+  			<scope>system</scope>
+  			<systemPath>${basedir}/libs/sepia-chat-v1.1.0.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.5.0-b01</version>
+		</dependency>
+		<dependency>
+			<groupId>com.rometools</groupId>
+			<artifactId>rome</artifactId>
+			<version>1.7.4</version>
+		</dependency>
+		<dependency>
+  			<groupId>net.b07z.sepia.server.assist</groupId>
+			<artifactId>sepia-assist-API</artifactId>
+			<version>2.2.0</version>
+  			<scope>system</scope>
+  			<systemPath>${basedir}/libs/sepia-assist-v2.2.0.jar</systemPath>
+		</dependency>
+		<!-- -->
+		
+		<!-- Java Docs / not really working, need to load manually via IDE -->
+		<dependency>
+  			<groupId>net.b07z.sepia.server.core</groupId>
+  			<artifactId>sepia-core-tools</artifactId>
+  			<version>2.2.0</version>
+  			<classifier>javadoc</classifier>
+  			<scope>system</scope>
+  			<systemPath>${basedir}/libs/sepia-core-tools-v2.2.0-javadoc.jar</systemPath>
+		</dependency>
+		<dependency>
+  			<groupId>net.b07z.sepia.server.assist</groupId>
+			<artifactId>sepia-assist-API</artifactId>
+			<version>2.2.0</version>
+			<classifier>javadoc</classifier>
+  			<scope>system</scope>
+  			<systemPath>${basedir}/libs/sepia-assist-v2.2.0-javadoc.jar</systemPath>
+		</dependency>
+		
+		<!-- JUnit -->
+		<dependency>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      		<version>4.12</version>
+      		<scope>test</scope>
+    	</dependency>
+  </dependencies>      
+</project>
