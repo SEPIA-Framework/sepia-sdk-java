@@ -2,6 +2,7 @@ package net.b07z.sepia.sdk.services.uid1007;
 
 import java.util.TreeSet;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import net.b07z.sepia.server.assist.answers.Answers;
@@ -10,6 +11,7 @@ import net.b07z.sepia.server.assist.assistant.LANGUAGES;
 import net.b07z.sepia.server.assist.data.Parameter;
 import net.b07z.sepia.server.assist.interpreters.NluResult;
 import net.b07z.sepia.server.assist.interviews.InterviewData;
+import net.b07z.sepia.server.assist.services.ServiceAccessManager;
 import net.b07z.sepia.server.assist.services.ServiceBuilder;
 import net.b07z.sepia.server.assist.services.ServiceInfo;
 import net.b07z.sepia.server.assist.services.ServiceInterface;
@@ -150,6 +152,11 @@ public class WorkoutHelperDemo implements ServiceInterface {
 				getInfoFreshOrCache(nluResult.input, this.getClass().getCanonicalName()),
 				getAnswersPool(nluResult.language));
 		
+		//test-load stored data
+		ServiceAccessManager sam0 = new ServiceAccessManager("demokey");
+		JSONObject userData = api.readServiceDataForUser(sam0, "tasks");
+		System.out.println("result: " + userData);
+		
 		//get optional parameters:
 		
 		//-time
@@ -178,39 +185,48 @@ public class WorkoutHelperDemo implements ServiceInterface {
 		
 		//Schedule intervals
 		if (nluResult.input.isDuplexConnection()){
+			//Some info about the connection and message:
 			//System.out.println(nluResult.input.connection);
 			//System.out.println(nluResult.input.msgId);
 			//System.out.println(nluResult.input.duplexData);
+			
+			//Collect tasks
+			JSONArray tasksArray = new JSONArray();
 			//Finish
-			api.runInBackground(timeMinutes * 60 * 1000, () -> {
+			JSON.add(tasksArray, api.runOnceInBackground(timeMinutes * 60 * 1000, () -> {
 				//initialize follow-up result
 				ServiceBuilder service = new ServiceBuilder(nluResult);
 				service.answer = Answers.getAnswerString(nluResult, followUpFinish);
 				service.status = "success";
 				/*boolean wasSent =*/ service.sendFollowUpMessage(nluResult.input, service.buildResult());
 				return;
-			});
+			}).getJson());
 			//Interval minutes
 			if (halfTimeMinutes >= 2){
-				api.runInBackground(halfTimeMinutes * 60 * 1000, () -> {
+				JSON.add(tasksArray, api.runOnceInBackground(halfTimeMinutes * 60 * 1000, () -> {
 					//initialize follow-up result
 					ServiceBuilder service = new ServiceBuilder(nluResult);
 					service.answer = Answers.getAnswerString(nluResult, followUpIntervalMinutes, halfTimeMinutes);
 					service.status = "success";
 					/*boolean wasSent =*/ service.sendFollowUpMessage(nluResult.input, service.buildResult());
 					return;
-				});
+				}).getJson());
 			}
 			//Interval 30s seconds
 			long seconds = 30;
-			api.runInBackground((timeMinutes * 60 * 1000) - (seconds * 1000), () -> {
+			JSON.add(tasksArray, api.runOnceInBackground((timeMinutes * 60 * 1000) - (seconds * 1000), () -> {
 				//initialize follow-up result
 				ServiceBuilder service = new ServiceBuilder(nluResult);
 				service.answer = Answers.getAnswerString(nluResult, followUpIntervalSeconds, seconds);
 				service.status = "success";
 				/*boolean wasSent =*/ service.sendFollowUpMessage(nluResult.input, service.buildResult());
 				return;
-			});
+			}).getJson());
+			
+			//Store task info for later access in service-specific storage - overwrite old if any
+			ServiceAccessManager sam = new ServiceAccessManager("demokey");
+			int resCode = api.writeServiceDataForUser(sam, JSON.make("tasks", tasksArray));
+			System.out.println("resCode: " + resCode);		//DEBUG
 		}
 				
 		//all good
