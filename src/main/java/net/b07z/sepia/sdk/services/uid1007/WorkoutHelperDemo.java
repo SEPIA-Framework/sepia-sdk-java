@@ -24,7 +24,7 @@ import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.Sdk;
 
 /**
- * Demo for a workout help service. This is mainly to demonstrate follow-up messages.
+ * Demo of a workout helper service. This is mainly to demonstrate background follow-up messages and database access.
  * 
  * @author Florian Quirin
  *
