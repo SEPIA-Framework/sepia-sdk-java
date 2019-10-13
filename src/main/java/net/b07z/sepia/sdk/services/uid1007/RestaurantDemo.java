@@ -97,7 +97,7 @@ public class RestaurantDemo implements ServiceInterface {
 				;
 			return answerPool;
 		
-		//Other languages not yet supported
+		//Other languages are not used in this demo yet
 		}else{
 			return null;
 		}
