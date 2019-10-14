@@ -10,6 +10,7 @@ import net.b07z.sepia.server.assist.answers.ServiceAnswers;
 import net.b07z.sepia.server.assist.assistant.LANGUAGES;
 import net.b07z.sepia.server.assist.data.Parameter;
 import net.b07z.sepia.server.assist.interpreters.NluResult;
+import net.b07z.sepia.server.assist.interviews.Interview;
 import net.b07z.sepia.server.assist.interviews.InterviewData;
 import net.b07z.sepia.server.assist.services.ServiceAccessManager;
 import net.b07z.sepia.server.assist.services.ServiceBuilder;
@@ -20,6 +21,7 @@ import net.b07z.sepia.server.assist.services.ServiceInfo.Content;
 import net.b07z.sepia.server.assist.services.ServiceInfo.Type;
 import net.b07z.sepia.server.core.assistant.PARAMETERS;
 import net.b07z.sepia.server.core.data.Language;
+import net.b07z.sepia.server.core.tools.Debugger;
 import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.Sdk;
 
@@ -108,9 +110,17 @@ public class WorkoutHelperDemo implements ServiceInterface {
 		
 		//Direct-match trigger sentences in different languages:
 		String EN = Language.EN.toValue();
-		info.addCustomTriggerSentence("Start a simple workout.", EN);
+		info.addCustomTriggerSentence("Start a simple workout.", EN)
+			.addCustomTriggerSentenceWithExtractedParameters("7 minutes workout.", EN, JSON.make(
+					PARAMETERS.TIME, Interview.INPUT_RAW,		//This will tell the 'Interview' module to extract the time from the raw text
+					PARAMETERS.ACTION, "<on>"					//This is what the Action parameter handler usually extracts for ON/START/ACTIVATE etc.
+			));
 		String DE = Language.DE.toValue();
-		info.addCustomTriggerSentence("Ein einfaches Workout starten.", DE);
+		info.addCustomTriggerSentence("Ein einfaches Workout starten.", DE)
+			.addCustomTriggerSentenceWithRawParameters("7 Minuten Workout.", DE, JSON.make(
+					PARAMETERS.TIME, "7 Minuten",		//Here we use raw text, ... 
+					PARAMETERS.ACTION, "starten"		//... and let the 'Interview' module normalize and extract the parameter
+			));
 		
 		//Regular expression triggers:
 		info.setCustomTriggerRegX(".*\\b("
@@ -129,7 +139,9 @@ public class WorkoutHelperDemo implements ServiceInterface {
 		
 		Parameter p1 = new Parameter(PARAMETERS.TIME)
 				.setRequired(false);
-		info.addParameter(p1);
+		Parameter p2 = new Parameter(PARAMETERS.ACTION)
+				.setRequired(false);
+		info.addParameter(p1).addParameter(p2);
 		
 		//Answers (these are the default answers, you can trigger a custom answer at any point in the module 
 		//with serviceBuilder.setCustomAnswer(..)):
@@ -155,7 +167,7 @@ public class WorkoutHelperDemo implements ServiceInterface {
 		//test-load stored data
 		ServiceAccessManager sam0 = new ServiceAccessManager("demokey");
 		JSONObject userData = api.readServiceDataForUser(sam0, "tasks");
-		System.out.println("result: " + userData);
+		Debugger.println(CMD_NAME + " result: " + userData, 3); 		//DEBUG
 		
 		//get optional parameters:
 		
