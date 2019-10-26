@@ -48,6 +48,17 @@ public class FhemDemo implements ServiceInterface {
 	//Command name of your service (will be combined with userId to be unique, e.g. 'uid1007.python_bridge')
 	private static final String CMD_NAME = "fhem";
 	
+	//TODO: add in SEPIA v2.3.2
+	/*
+	@Override
+	public ServiceRequirements getRequirements(){
+		return new ServiceRequirements()
+			.serverMinVersion("2.3.2")
+			.apiAccess(ServiceRequirements.Apis.fhem)
+		;
+	}
+	*/
+	
 	//Define some sentences for testing:
 	
 	@Override
@@ -177,7 +188,7 @@ public class FhemDemo implements ServiceInterface {
 		
 		//this services uses the 'SmartHomeHub' interface
 		String smartHomeHubHost = "http://localhost:8083/fhem";
-		SmartHomeHub smartHomeHUB = new Fhem(smartHomeHubHost);
+		Fhem smartHomeHUB = new Fhem(smartHomeHubHost);			//TODO: replace with 'SmartHomeHub' in SEPIA v2.3.2
 				
 		//get required parameters
 		Parameter device = nluResult.getRequiredParameter(PARAMETERS.SMART_DEVICE);
@@ -196,6 +207,12 @@ public class FhemDemo implements ServiceInterface {
 		//Device is FHEM server itself?
 		if (typeIsEqual(deviceType, SmartDevice.Types.device) && deviceName.equals("FHEM")){
 			if (typeIsEqual(actionType, Action.Type.show)){
+				//check if SEPIA is registered - if not try to register
+				if (!smartHomeHUB.registerSepiaFramework()){
+					//FAIL
+					service.setStatusFail(); 				//"hard"-fail (probably connection or token error)
+					return service.buildResult();
+				}
 				//get devices
 				Map<String, SmartHomeDevice> devices = smartHomeHUB.getDevices();
 				if (devices == null){
@@ -205,7 +222,7 @@ public class FhemDemo implements ServiceInterface {
 				}else{
 					//list devices
 					for (SmartHomeDevice shd : devices.values()){
-						service.addToExtendedLog("device: " + shd.getDeviceAsJson().toJSONString());
+						service.addToExtendedLog("device: " + shd.getDeviceAsJson().toJSONString());		//DEBUG
 					}
 					//all good
 					service.setStatusSuccess();
@@ -254,13 +271,19 @@ public class FhemDemo implements ServiceInterface {
 		return value.equals(type.name());
 	}
 	
-	//------------- FHEM -------------
+	//------------- FHEM ------------- //TODO: move to server
 	
 	public static class Fhem implements SmartHomeHub {
 		
 		private String host;
 		private String csrfToken = "";
 		public static final String NAME = "fhem";
+		
+		private static final String TAG_NAME = "sepia-name";		//TODO: replace with SmartHomeDevice.SEPIA_TAG_.. in SEPIA v2.3.2
+		private static final String TAG_TYPE = "sepia-type";
+		private static final String TAG_ROOM = "sepia-room";
+		private static final String TAG_DATA = "sepia-data";
+		private static final String TAG_MEM_STATE = "sepia-mem-state";
 		
 		/**
 		 * Create new FHEM instance and automatically get CSRF token.
@@ -285,6 +308,55 @@ public class FhemDemo implements ServiceInterface {
 			}else{
 				this.host = host;
 				this.csrfToken = csrfToken;
+			}
+		}
+		
+		//TODO: add override annotation in SEPIA v2.3.2+
+		public boolean registerSepiaFramework(){
+			//Find attributes first
+			String foundAttributes = "";
+			String getUrl = URLBuilder.getString(this.host, 
+					"?cmd=", "jsonlist2 global",
+					"&XHR=", "1",
+					"&fwcsrf=", this.csrfToken
+			);
+			try {
+				//Call and check
+				JSONObject resultGet = Connectors.httpGET(getUrl);
+				if (Connectors.httpSuccess(resultGet) && JSON.getIntegerOrDefault(resultGet, "totalResultsReturned", 0) == 1){
+					foundAttributes = (String) JSON.getJObject((JSONObject) JSON.getJArray(resultGet, "Results").get(0), "Attributes").get("userattr");
+					if (Is.nullOrEmpty(foundAttributes)){
+						Debugger.println("FHEM - registerSepiaFramework: Failed! No existing 'userattr' found in 'global' attributes. Please add manually.", 1);
+						return false;
+					}else{
+						//System.out.println("foundAttributes: " + foundAttributes); 			//DEBUG
+						//check if attributes are already there (if one is there all should be there ...)
+						if (foundAttributes.matches(".*\\b" + TAG_NAME + "\\b.*")){
+							return true;
+						}
+					}
+				}else{
+					Debugger.println("FHEM - registerSepiaFramework: Failed! Could not load global attributes. Msg.: " + resultGet.toJSONString(), 1);
+					return false;
+				}
+				//Register FHEM means adding the SEPIA tags to global attributes
+				String setUrl = URLBuilder.getString(this.host, 
+						"?cmd=", "attr global userattr " + foundAttributes + " " + TAG_NAME + " " + TAG_TYPE + " " + TAG_ROOM + " " + TAG_DATA + " " + TAG_MEM_STATE,
+						"&XHR=", "1",
+						"&fwcsrf=", this.csrfToken
+				);
+				JSONObject resultSet = Connectors.httpGET(setUrl);
+				if (Connectors.httpSuccess(resultSet)){
+					//all good
+					return true;
+				}else{
+					Debugger.println("FHEM - registerSepiaFramework: Failed! Could not set global attributes. Msg.: " + resultSet.toJSONString(), 1);
+					return false;
+				}
+			}catch (Exception e){
+				Debugger.println("FHEM - registerSepiaFramework: Failed! Error: " + e.getMessage(), 1);
+				Debugger.printStackTrace(e, 3);
+				return false;
 			}
 		}
 
@@ -375,7 +447,7 @@ public class FhemDemo implements ServiceInterface {
 			String memoryState = "";
 			if (attributes != null){
 				//try to find self-defined SEPIA tags first
-				name = JSON.getStringOrDefault(attributes, "sepia-name", null);
+				name = JSON.getStringOrDefault(attributes, "sepia-name", null);				//TODO: replace with SmartHomeDevice.SEPIA_TAG_NAME in SEPIA v2.3.2+
 				type = JSON.getStringOrDefault(attributes, "sepia-type", null);
 				room = JSON.getStringOrDefault(attributes, "sepia-room", null);
 				memoryState = JSON.getStringOrDefault(attributes, "sepia-mem-state", null);
@@ -390,9 +462,9 @@ public class FhemDemo implements ServiceInterface {
 			}
 			if (type == null && internals != null){
 				String fhemType = JSON.getString(internals, "type").toLowerCase(); 
-				if (fhemType.matches("(.*\\s|^)(light.*|lamp.*)")){
+				if (fhemType.matches("(.*\\s|^|,)(light.*|lamp.*)")){
 					type = SmartDevice.Types.light.name();		//LIGHT
-				}else if (fhemType.matches("(.*\\s|^)(heat.*|thermo.*)")){
+				}else if (fhemType.matches("(.*\\s|^|,)(heat.*|thermo.*)")){
 					type = SmartDevice.Types.heater.name();		//HEATER
 				}else{
 					type = fhemType;		//take this if we don't have a specific type yet
@@ -406,8 +478,10 @@ public class FhemDemo implements ServiceInterface {
 			String fhemObjName = JSON.getStringOrDefault(hubDevice, "Name", null);
 			Object stateObj = JSON.getObject(hubDevice, new String[]{"Readings", "state"});
 			Object linkObj = (fhemObjName != null)? (this.host + "?cmd." + fhemObjName) : null;
-			JSONObject meta = null;
-			//TODO: we could add some stuff to meta when we need other data from response.
+			JSONObject meta = JSON.make(
+					"fhem-id", fhemObjName
+			);
+			//note: we need fhem-id for commands although it is basically already in 'link'
 			SmartHomeDevice shd = new SmartHomeDevice(name, type, room, 
 					(stateObj != null)? stateObj.toString() : null, memoryState, 
 					(linkObj != null)? linkObj.toString() : null, meta);
