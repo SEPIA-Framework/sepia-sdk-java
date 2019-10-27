@@ -112,6 +112,7 @@ public class FhemDemo implements ServiceInterface {
 	private static final String okAnswer = ServiceAnswers.ANS_PREFIX + CMD_NAME + "_still_ok_0a";
 	private static final String deviceStateSet = ServiceAnswers.ANS_PREFIX + CMD_NAME + "_state_set_0a";
 	private static final String deviceStateShow = ServiceAnswers.ANS_PREFIX + CMD_NAME + "_state_show_0a";
+	private static final String askStateValue = "smartdevice_1d";
 	private static final String failAnswer = "error_0a";
 	private static final String notAllowed = "smartdevice_0d";
 	
@@ -168,6 +169,7 @@ public class FhemDemo implements ServiceInterface {
 			.addOkayAnswer(okAnswer)
 			.addCustomAnswer("setState", deviceStateSet) 	//adding these answers here is optional and used just as info
 			.addCustomAnswer("showState", deviceStateShow)
+			.addCustomAnswer("askStateValue", askStateValue)
 			.addCustomAnswer("notAllowed", notAllowed)
 		;
 		
@@ -244,23 +246,13 @@ public class FhemDemo implements ServiceInterface {
 		}else if (typeIsEqual(deviceType, SmartDevice.Types.light)){
 			//SHOW lights status
 			if (typeIsEqual(actionType, Action.Type.show)){
-				//find device - we always load a fresh list
-				Map<String, SmartHomeDevice> devices = smartHomeHUB.getDevices();
-				if (devices == null){
+				//find device
+				SmartHomeDevice selectedDevice = findDevice(smartHomeHUB, deviceType, roomType);
+				if (selectedDevice == null){
 					//FAIL
-					service.setStatusFail(); 				//"hard"-fail (probably connection or token error)
+					service.setStatusFail();	//TODO: improve answers (error, no match, etc.) with service.setCustomAnswer(...);
 					return service.buildResult();
 				}else{
-					//get all devices with right type and optionally right room
-					List<SmartHomeDevice> matchingDevices = SmartOpenHAB.getMatchingDevices(devices, deviceType, roomType, -1);
-					//have found any?
-					if (matchingDevices.isEmpty()){
-						service.setStatusOkay();
-						//service.setCustomAnswer(noDeviceMatchesFound);	//TODO: improve answer
-						return service.buildResult();
-					}
-					//keep only the first match for now - TODO: improve
-					SmartHomeDevice selectedDevice = matchingDevices.get(0);
 					String state = selectedDevice.getState();
 					String name = selectedDevice.getName();
 					
@@ -274,6 +266,36 @@ public class FhemDemo implements ServiceInterface {
 					
 					//DEBUG
 					//System.out.println(selectedDevice.getDeviceAsJson());
+				}
+				
+			//SET lights status
+			}else if (typeIsEqual(actionType, Action.Type.set)){
+				//check if we have a value or need to ask
+				String targetSetValue = deviceValue.getValueAsString(); 		//NOTE: we have more options here than only "VALUE"
+				if (targetSetValue.isEmpty()){ 
+					service.setIncompleteAndAsk(PARAMETERS.SMART_DEVICE_VALUE, askStateValue);
+					return service.buildResult();
+				}
+				//find device
+				SmartHomeDevice selectedDevice = findDevice(smartHomeHUB, deviceType, roomType);
+				if (selectedDevice == null){
+					//FAIL
+					service.setStatusFail();	//TODO: improve answers (error, no match, etc.) with service.setCustomAnswer(...);
+					return service.buildResult();
+				}else{
+					boolean setSuccess = smartHomeHUB.setDeviceState(selectedDevice, "pct " + targetSetValue);	//we assume percentage here, TODO: use parameter info to decide
+					if (setSuccess){
+						//response info
+						String name = selectedDevice.getName();
+						service.resultInfoPut("device_name", name);
+						service.resultInfoPut("device_value", SmartOpenHAB.getStateLocal(targetSetValue, service.language));
+						//answer
+						service.setCustomAnswer(deviceStateSet);
+					}else{
+						//fail answer
+						service.setStatusFail(); 						//"hard"-fail (probably openHAB connection error)
+						return service.buildResult();
+					}
 				}
 				
 			//Other light actions?
@@ -320,6 +342,24 @@ public class FhemDemo implements ServiceInterface {
 	 */
 	private static boolean typeIsEqual(String value, Enum<?> type){
 		return value.equals(type.name());
+	}
+	
+	private SmartHomeDevice findDevice(SmartHomeHub smartHomeHUB, String deviceType, String roomType){
+		//find device - we always load a fresh list
+		Map<String, SmartHomeDevice> devices = smartHomeHUB.getDevices();
+		if (devices == null){
+			return null;
+		}else{
+			//get all devices with right type and optionally right room
+			List<SmartHomeDevice> matchingDevices = SmartOpenHAB.getMatchingDevices(devices, deviceType, roomType, -1);
+			//have found any?
+			if (matchingDevices.isEmpty()){
+				return null;
+			}
+			//keep only the first match for now - TODO: improve
+			SmartHomeDevice selectedDevice = matchingDevices.get(0);
+			return selectedDevice;
+		}
 	}
 	
 	//------------- FHEM ------------- //TODO: move to server
@@ -446,13 +486,36 @@ public class FhemDemo implements ServiceInterface {
 				return null;
 			}
 		}
+		
+		//TODO: add override annotation in SEPIA v2.3.2+
+		public boolean writeDeviceAttribute(SmartHomeDevice device, String attrName, String attrValue){
+			String fhemId = device.getMetaValueAsString("fhem-id");
+			String deviceCmdLink = device.getLink(); 
+			if (Is.nullOrEmpty(fhemId) || Is.nullOrEmpty(deviceCmdLink)){
+				return false;
+			}else{
+				String cmdUrl = URLBuilder.getString(
+						deviceCmdLink, "=", "attr " + fhemId + " " + attrName + " " + attrValue,
+						"&XHR=", "1",
+						"&fwcsrf=", this.csrfToken
+				);
+				JSONObject response = Connectors.httpGET(cmdUrl);
+				//System.out.println("RESPONSE: " + response); 		//this is usually empty if there was no error
+				return Connectors.httpSuccess(response);
+			}
+		}
 
 		@Override
 		public SmartHomeDevice loadDeviceData(SmartHomeDevice device){
-			String deviceURL = "";		//TODO - build this: http://localhost:8083/fhem?cmd=jsonlist2%20MyHueBridge_HUEDevice1&XHR=1&fwcsrf=csrf_680293651159739
-			if (Is.nullOrEmpty(deviceURL)){
+			String fhemId = device.getMetaValueAsString("fhem-id");
+			if (Is.nullOrEmpty(fhemId)){
 				return null;
 			}else{
+				String deviceURL = URLBuilder.getString(this.host, 
+						"?cmd=", "jsonlist2 " + fhemId,
+						"&XHR=", "1",
+						"&fwcsrf=", this.csrfToken
+				);
 				JSONObject response = Connectors.httpGET(deviceURL);
 				if (Connectors.httpSuccess(response)){
 					//build shd from response
@@ -465,15 +528,27 @@ public class FhemDemo implements ServiceInterface {
 		}
 
 		@Override
-		public boolean setDeviceState(SmartHomeDevice arg0, String arg1){
-			// TODO Auto-generated method stub
-			return false;
+		public boolean setDeviceState(SmartHomeDevice device, String state){
+			String fhemId = device.getMetaValueAsString("fhem-id");
+			String deviceCmdLink = device.getLink(); 
+			if (Is.nullOrEmpty(fhemId) || Is.nullOrEmpty(deviceCmdLink)){
+				return false;
+			}else{
+				String cmdUrl = URLBuilder.getString(
+						deviceCmdLink, "=", "set " + fhemId + " " + state,
+						"&XHR=", "1",
+						"&fwcsrf=", this.csrfToken
+				);
+				//System.out.println("URL: " + cmdUrl); 			//DEBUG
+				JSONObject response = Connectors.httpGET(cmdUrl);
+				//System.out.println("RESPONSE: " + response); 		//this is usually empty if there was no error
+				return Connectors.httpSuccess(response);
+			}
 		}
 
 		@Override
-		public boolean setDeviceStateMemory(SmartHomeDevice arg0, String arg1){
-			// TODO Auto-generated method stub
-			return false;
+		public boolean setDeviceStateMemory(SmartHomeDevice device, String memState){
+			return writeDeviceAttribute(device, "sepia-mem-state", memState);		//TODO: replace with SmartHomeDevice.SEPIA_TAG_NAME in SEPIA v2.3.2+
 		}
 		
 		//------------- FHEM specific helper methods --------------
@@ -540,7 +615,7 @@ public class FhemDemo implements ServiceInterface {
 			String fhemObjName = JSON.getStringOrDefault(hubDevice, "Name", null);
 			//JSONObject stateObj = JSON.getJObject(hubDevice, new String[]{"Readings", "state"});
 			//String state = (stateObj != null)? JSON.getString(stateObj, "Value") : null;
-			String state = JSON.getStringOrDefault(internals, "STATE", null);
+			String state = JSON.getStringOrDefault(internals, "STATE", null);			//TODO: think about states like 'dim50%'
 			Object linkObj = (fhemObjName != null)? (this.host + "?cmd." + fhemObjName) : null;
 			JSONObject meta = JSON.make(
 					"fhem-id", fhemObjName
@@ -551,7 +626,6 @@ public class FhemDemo implements ServiceInterface {
 					(linkObj != null)? linkObj.toString() : null, meta);
 			return shd;
 		}
-		
 	}
 
 }
