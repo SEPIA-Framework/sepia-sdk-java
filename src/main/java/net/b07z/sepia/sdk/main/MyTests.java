@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import net.b07z.sepia.sdk.connect.AssistApi;
 import net.b07z.sepia.sdk.connect.UploadService;
-import net.b07z.sepia.sdk.services.uid1007.WorkoutHelperDemo;
+import net.b07z.sepia.sdk.services.uid1007.MqttDemo;
 import net.b07z.sepia.server.assist.services.ServiceInterface;
 import net.b07z.sepia.server.core.data.Language;
 
@@ -19,7 +19,7 @@ public class MyTests {
 	public static void main(String[] args) {
 		
 		//Define class, language and sentence (optional)
-        ServiceInterface service = new WorkoutHelperDemo(); //new RestaurantDemo();
+        ServiceInterface service = new MqttDemo(); //new PythonBridgeDemo(); //new RestaurantDemo(); new WorkoutHelperDemo();
         Language language = Language.EN;
         String testSentence = null; //"reserve a table for 2"; 	//we use the ones included in the service
         
