@@ -44,9 +44,12 @@ public class MqttDemo implements ServiceInterface {
 	private static final String CMD_NAME = "mqtt";
 	
 	//MQTT broker address
+	//private String mqttBroker = "tcp://localhost:1883"; 		//Typical Mosquitto broker on same machine
+	//private String mqttBroker = "ws://localhost:1883"; 		//Mosquitto broker on same machine configured for WebSockets
 	private String mqttBroker = "ws://broker.hivemq.com:8000";		//public test broker
 	private String mqttUserName = "";
 	private String mqttPassword = "";
+	private String sepiaMqttTopic = "sepia/mqtt-demo";		//SEPIA MQTT topic
 	
 	@Override
 	public ServiceRequirements getRequirements(){
@@ -216,6 +219,25 @@ public class MqttDemo implements ServiceInterface {
 		}else{
 			//connect to MQTT broker, build message, broadcast
 			try{
+				//payload
+				JSONObject payload = JSON.make(
+						"deviceType", deviceType,
+						"deviceIndex", (deviceNumber == Integer.MIN_VALUE)? "" : String.valueOf(deviceNumber),
+						"roomType", roomType,
+						"roomIndex", (roomNumber == Integer.MIN_VALUE)? "" : String.valueOf(roomNumber)
+				);
+				JSON.put(payload, "action", JSON.make(
+						"type", actionType,
+						"value", targetSetValue,
+						"valueType", targetValueType
+				));
+				JSON.put(payload, "input", JSON.make(
+						"textRaw", nluResult.input.textRaw,
+						"text", nluResult.input.text,
+						"user", nluResult.input.user.getUserID()
+				));
+				
+				//connect
 				SepiaMqttClientOptions mqttOptions = new SepiaMqttClientOptions()
 						.setAutomaticReconnect(false)
 						.setCleanSession(true)
@@ -228,17 +250,8 @@ public class MqttDemo implements ServiceInterface {
 				}
 				SepiaMqttClient mqttClient = new SepiaMqttClient(mqttBroker, mqttOptions);
 				mqttClient.connect();
-				mqttClient.publish("sepia/mqtt-demo", new SepiaMqttMessage(JSON.make(
-						"deviceType", deviceType,
-						"deviceIndex", (deviceNumber == Integer.MIN_VALUE)? "" : String.valueOf(deviceNumber),
-						"roomType", roomType,
-						"roomIndex", (roomNumber == Integer.MIN_VALUE)? "" : String.valueOf(roomNumber),
-						"action", JSON.make(
-							"type", actionType,
-							"value", targetSetValue,
-							"valueType", targetValueType
-						)
-				).toJSONString())
+				//publish
+				mqttClient.publish(sepiaMqttTopic, new SepiaMqttMessage(payload.toJSONString())
 						.setQos(0)
 						.setRetained(false)
 				);
