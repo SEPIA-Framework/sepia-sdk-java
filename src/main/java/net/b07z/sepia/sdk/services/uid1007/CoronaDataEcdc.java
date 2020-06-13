@@ -41,6 +41,12 @@ import net.b07z.sepia.server.core.tools.Is;
 import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.Sdk;
 
+/**
+ * Service that loads Covid-19 data via the public ECDC API and generates info messages presenting total cases, deaths and recent cases for a specific country (or "world" summary).   
+ * 
+ * @author Florian Quirin
+ * 
+ */
 public class CoronaDataEcdc implements ServiceInterface {
 	
 	//USED: 		https://opendata.ecdc.europa.eu/covid19/casedistribution/csv/
@@ -77,7 +83,7 @@ public class CoronaDataEcdc implements ServiceInterface {
 		if (language.equals(LANGUAGES.DE)){
 			answerPool
 				.addAnswer(successAnswer, 	0, "Hier sind die aktuellen, weltweiten Corona Zahlen des ECDC. "
-						+ "Fälle insgesamt: <2>. Tote insgesamt: <3>. Neue Fälle: <4>.")
+						+ "Fälle insgesamt: <2>. Tote insgesamt: <3>.")
 				.addAnswer(successWithCountry, 	0, "Hier sind die aktuellen Corona Zahlen des ECDC für <1>. "
 						+ "Fälle insgesamt: <2>. Tote insgesamt: <3>. Neue Fälle: <4>.")
 				.addAnswer(okAnswer, 		0, "Die Anfrage ist angekommen aber ich kann sie nicht bearbeiten.")
@@ -88,7 +94,7 @@ public class CoronaDataEcdc implements ServiceInterface {
 		}else{
 			answerPool	
 				.addAnswer(successAnswer, 	0, "Here are the recent, worldwide Corona numbers from the ECDC. "
-						+ "Total cases: <2>. Total deaths: <3>. New cases: <4>.")
+						+ "Total cases: <2>. Total deaths: <3>.")
 				.addAnswer(successWithCountry, 	0, "Here are the recent ECDC Corona numbers for <1>. "
 						+ "Total cases: <2>. Total deaths: <3>. New cases: <4>.")
 				.addAnswer(okAnswer, 		0, "Message received but I could not fulfill your request.")
@@ -159,6 +165,7 @@ public class CoronaDataEcdc implements ServiceInterface {
 		
 		//get optional parameters:
 		
+		//this is the custom 'CountryCode3' parameter defined below
 		Parameter countryCodeP = nluResult.getRequiredParameter(CountryCode3.class.getName());
 		String threeLetterCode = countryCodeP.getValueAsString();
 		String countryLocalName = (String) countryCodeP.getDataFieldOrDefault(InterviewData.VALUE_LOCAL);
@@ -169,7 +176,7 @@ public class CoronaDataEcdc implements ServiceInterface {
 			countryFilter = threeLetterCode;
 		}
 		
-		//test call
+		//get data
 		try{
 			JSONObject data = getCovid19Data(countryFilter);
 			if (Is.nullOrEmpty(data)){
@@ -187,11 +194,13 @@ public class CoronaDataEcdc implements ServiceInterface {
 				}catch (Exception e){
 					recentNewCases = defaultLocalUnknown;
 				}
+				//set all answer parameters
 				service.resultInfoPut("country", countryLocalName);
 				service.resultInfoPut("cases", Converters.obj2StringOrDefault(data.get("cases"), defaultLocalUnknown));
 				service.resultInfoPut("deaths", Converters.obj2StringOrDefault(data.get("deaths"), defaultLocalUnknown));
 				service.resultInfoPut("new_cases", recentNewCases);
 				
+				//choose the country or "world" answer
 				if (countryFilter != null){
 					service.setCustomAnswer(successWithCountry);
 				}
@@ -219,6 +228,7 @@ public class CoronaDataEcdc implements ServiceInterface {
 	 */
 	public static class CountryCode3 extends CustomParameter {
 		
+		//Regular expressions for the supported countries in DE and EN:
 		private static String gbrRegEx_en = "english|england|britain|british|united kongdom|uk|gbr|gb";
 		private static String gbrRegEx_de = "englisch(en|e|)|england|(gross|)britannien|britisch(en|e|)|uk|vereinigtes koenigreich|uk|gbr|gb";
 		
@@ -261,9 +271,11 @@ public class CoronaDataEcdc implements ServiceInterface {
 			
 			//German
 			if (this.language.equals(LANGUAGES.DE)){
+				//find any of the supported countries
 				found = NluTools.stringFindFirst(input, all_de);
 				if (Is.nullOrEmpty(found)){
 					return "";
+				//construct the country result with ISO code + local name
 				}else if (NluTools.stringContains(found, gbrRegEx_de)){
 					extracted = "GBR;;England;;";
 				}else if (NluTools.stringContains(found, deuRegEx_de)){
@@ -279,9 +291,11 @@ public class CoronaDataEcdc implements ServiceInterface {
 				}
 			//English
 			}else if (this.language.equals(LANGUAGES.EN)){
+				//find any of the supported countries
 				found = NluTools.stringFindFirst(input, all_en);
 				if (Is.nullOrEmpty(found)){
 					return "";
+				//construct the country result with ISO code + local name
 				}else if (NluTools.stringContains(found, gbrRegEx_en)){
 					extracted = "GBR;;England;;";
 				}else if (NluTools.stringContains(found, deuRegEx_en)){
