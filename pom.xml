@@ -110,7 +110,7 @@
         <dependency>
     		<groupId>org.eclipse.paho</groupId>
     		<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-    		<version>1.2.0</version> <!-- NOTE: we can't use 1.2.2 due to: https://github.com/eclipse/paho.mqtt.java/issues/572 -->
+    		<version>1.2.1</version> <!-- NOTE: we can't use 1.2.2 due to: https://github.com/eclipse/paho.mqtt.java/issues/572 -->
 		</dependency>
 		<dependency>
   			<groupId>net.b07z.sepia.websockets</groupId>
