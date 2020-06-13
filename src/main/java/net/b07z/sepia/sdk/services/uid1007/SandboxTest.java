@@ -166,7 +166,7 @@ public class SandboxTest implements ServiceInterface{
 	
 	private boolean testRuntimeCommands(){
 		try{
-			RuntimeResult rtr = RuntimeInterface.runCommand(new String[]{"echo", "Hello World!"}, 5000);
+			RuntimeResult rtr = RuntimeInterface.runCommand(new String[]{"echo", "Hello World!"}, 5000, false);
 			if (rtr.getStatusCode() == 1 && rtr.getException().getClass().equals(java.security.AccessControlException.class)){
 				Debugger.println("Runtime access failed as planned with: " + rtr.getException().getMessage(), 3);
 				return true;
