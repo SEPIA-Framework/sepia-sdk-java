@@ -68,9 +68,11 @@ public class CoronaDataEcdc implements ServiceInterface {
 		//GERMAN
 		if (lang.equals(Language.DE.toValue())){
 			samples.add("Zeig mir die aktuellen Corona Daten aus Deutschland.");
+			samples.add("Wie viele Coronavirus Fälle gibt es in Deutschland?");
 		//OTHER
 		}else{
 			samples.add("Show me Corona data from England.");
+			samples.add("How many Coronavirus cases are there in the UK?");
 		}
 		return samples;
 	}
@@ -125,13 +127,13 @@ public class CoronaDataEcdc implements ServiceInterface {
 		//Regular expression triggers
 		//NOTE: use 'normalized' text here, e.g. lower-case and no special characters ?, !, ., ', etc. ... for ä, ö, ü, ß, ... use ae, oe, ue, ss, ...
 		info.setCustomTriggerRegX(".*\\b("
-				+ "(corona|covid(-19|)) (data|numbers|cases|deaths)|"
-				+ "(sick|ill|died|deaths) (by|through) (corona|covid(-19|))"
+				+ "(corona|covid(-19|))((-| |)virus|) (data|numbers|cases|deaths)|"
+				+ "(sick|ill|died|deaths) (by|through)( the|) (corona|covid(-19|))"
 				+ ")\\b.*", EN
 		);
 		info.setCustomTriggerRegX(".*\\b("
-				+ "(corona|covid(-19|)) (daten|zahlen|faelle|tote|kranke)|"
-				+ "(erkrankt|krank(e|)|gestorben|tote) (an|durch) (corona|covid(-19|))"
+				+ "(corona|covid(-19|))((-| |)virus|) (daten|zahlen|faelle|tote|kranke)|"
+				+ "(erkrankt|krank(e|)|gestorben|tote) (an|durch)( den| das|) (corona|covid(-19|))"
 				+ ")\\b.*", DE
 		);
 		info.setCustomTriggerRegXscoreBoost(3);		//boost service to increase priority over similar ones
@@ -224,7 +226,7 @@ public class CoronaDataEcdc implements ServiceInterface {
 	 * <br>
 	 * See: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3 <br>
 	 * <br>
-	 * Currently only supports: England, Germany, Spain, Italy, Brazil and USA.
+	 * Currently only supports a few countries, e.g.: England, Germany, Spain, Italy, Brazil, USA.
 	 */
 	public static class CountryCode3 extends CustomParameter {
 		
@@ -247,13 +249,17 @@ public class CoronaDataEcdc implements ServiceInterface {
 		private static String usaRegEx_en = "american|america|united states|usa";
 		private static String usaRegEx_de = "amerikanisch(en|e|)|amerika|usa";
 		
+		private static String turRegEx_en = "turkish|turkey|tur";
+		private static String turRegEx_de = "tuerkisch(en|e|)|tuerkei|tur";
+		
 		private static String all_en = 
 			gbrRegEx_en + "|" + 
 			deuRegEx_en + "|" + 
 			espRegEx_en + "|" + 
 			itaRegEx_en + "|" + 
 			braRegEx_en + "|" + 
-			usaRegEx_en
+			usaRegEx_en + "|" + 
+			turRegEx_en
 		;
 		private static String all_de = 
 			gbrRegEx_de + "|" + 
@@ -261,7 +267,8 @@ public class CoronaDataEcdc implements ServiceInterface {
 			espRegEx_de + "|" + 
 			itaRegEx_de + "|" + 
 			braRegEx_de + "|" + 
-			usaRegEx_de
+			usaRegEx_de + "|" + 
+			turRegEx_de
 		;
 
 		@Override
@@ -288,6 +295,8 @@ public class CoronaDataEcdc implements ServiceInterface {
 					extracted = "BRA;;Brasilien;;";
 				}else if (NluTools.stringContains(found, usaRegEx_de)){
 					extracted = "USA;;USA;;";
+				}else if (NluTools.stringContains(found, turRegEx_de)){
+					extracted = "TUR;;Türkei;;";
 				}
 			//English
 			}else if (this.language.equals(LANGUAGES.EN)){
@@ -299,15 +308,17 @@ public class CoronaDataEcdc implements ServiceInterface {
 				}else if (NluTools.stringContains(found, gbrRegEx_en)){
 					extracted = "GBR;;England;;";
 				}else if (NluTools.stringContains(found, deuRegEx_en)){
-					extracted = "DEU;;Deutschland;;";
+					extracted = "DEU;;Germany;;";
 				}else if (NluTools.stringContains(found, espRegEx_en)){
-					extracted = "ESP;;Spanien;;";
+					extracted = "ESP;;Spain;;";
 				}else if (NluTools.stringContains(found, itaRegEx_en)){
-					extracted = "ITA;;Italien;;";
+					extracted = "ITA;;Italy;;";
 				}else if (NluTools.stringContains(found, braRegEx_en)){
-					extracted = "BRA;;Brasilien;;";
+					extracted = "BRA;;Brazil;;";
 				}else if (NluTools.stringContains(found, usaRegEx_en)){
 					extracted = "USA;;USA;;";
+				}else if (NluTools.stringContains(found, turRegEx_en)){
+					extracted = "TUR;;Turkey;;";
 				}
 			
 			//Other languages
