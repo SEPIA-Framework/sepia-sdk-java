@@ -132,7 +132,7 @@ public class CoronaDataEcdc implements ServiceInterface {
 				+ ")\\b.*", EN
 		);
 		info.setCustomTriggerRegX(".*\\b("
-				+ "(corona|covid(-19|))((-| |)virus|) (daten|zahlen|faelle|tote|kranke)|"
+				+ "(corona|covid(-19|))((-| |)virus|)( |-|)(daten|zahlen|faelle|tote|kranke)|"
 				+ "(erkrankt|krank(e|)|gestorben|tote) (an|durch)( den| das|) (corona|covid(-19|))"
 				+ ")\\b.*", DE
 		);
