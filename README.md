@@ -32,4 +32,4 @@ You can load them in your favorite IDE via the build-path properties. In Eclipse
 - Click "Apply and close" and repeat the steps for the other SEPIA JAR files
 
 ## Good to know
-Services that have been uploaded are only available for the user that uploaded them unless you upload them with the 'assistant' user (core-account).
+Services that have been uploaded are only available for the user that uploaded them unless you set 'info.makePublic()' in the code and upload them with the **'assistant' user** (core-account, usually uid1005).
