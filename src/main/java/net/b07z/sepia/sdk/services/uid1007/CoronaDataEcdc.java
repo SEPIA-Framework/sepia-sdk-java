@@ -84,10 +84,10 @@ public class CoronaDataEcdc implements ServiceInterface {
 		//Build German answers
 		if (language.equals(LANGUAGES.DE)){
 			answerPool
-				.addAnswer(successAnswer, 	0, "Hier sind die aktuellen, weltweiten Corona Zahlen des ECDC. "
-						+ "Fälle insgesamt: <2>. Tote insgesamt: <3>.")
-				.addAnswer(successWithCountry, 	0, "Hier sind die aktuellen Corona Zahlen des ECDC für <1>. "
-						+ "Fälle insgesamt: <2>. Tote insgesamt: <3>. Neue Fälle: <4>.")
+				.addAnswer(successAnswer, 	0, "Hier sind die aktuellen, weltweiten Corona Zahlen des ECDC.  "
+						+ "Fälle insgesamt: <2>.  Tote insgesamt: <3>.")
+				.addAnswer(successWithCountry, 	0, "Hier sind die aktuellen Corona Zahlen des ECDC für <1>.  "
+						+ "Fälle insgesamt: <2>.  Tote insgesamt: <3>.  Neue Fälle: <4>.")
 				.addAnswer(okAnswer, 		0, "Die Anfrage ist angekommen aber ich kann sie nicht bearbeiten.")
 			;
 			return answerPool;
@@ -95,10 +95,10 @@ public class CoronaDataEcdc implements ServiceInterface {
 		//Or default to English
 		}else{
 			answerPool	
-				.addAnswer(successAnswer, 	0, "Here are the recent, worldwide Corona numbers from the ECDC. "
-						+ "Total cases: <2>. Total deaths: <3>.")
-				.addAnswer(successWithCountry, 	0, "Here are the recent ECDC Corona numbers for <1>. "
-						+ "Total cases: <2>. Total deaths: <3>. New cases: <4>.")
+				.addAnswer(successAnswer, 	0, "Here are the recent, worldwide Corona numbers from the ECDC.  "
+						+ "Total cases: <2>.  Total deaths: <3>.")
+				.addAnswer(successWithCountry, 	0, "Here are the recent ECDC Corona numbers for <1>.  "
+						+ "Total cases: <2>.  Total deaths: <3>.  New cases: <4>.")
 				.addAnswer(okAnswer, 		0, "Message received but I could not fulfill your request.")
 			;
 			return answerPool;
