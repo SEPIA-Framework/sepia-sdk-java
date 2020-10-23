@@ -210,7 +210,7 @@ public class WorkoutHelperDemo implements ServiceInterface {
 				ServiceBuilder service = new ServiceBuilder(nluResult);
 				service.answer = Answers.getAnswerString(nluResult, followUpFinish);
 				service.status = "success";
-				/*boolean wasSent =*/ service.sendFollowUpMessage(nluResult.input, service.buildResult());
+				/*boolean wasSent =*/ service.sendFollowUpMessage(service.buildResult());
 				return;
 			}).getJson());
 			//Interval minutes
@@ -220,7 +220,7 @@ public class WorkoutHelperDemo implements ServiceInterface {
 					ServiceBuilder service = new ServiceBuilder(nluResult);
 					service.answer = Answers.getAnswerString(nluResult, followUpIntervalMinutes, halfTimeMinutes);
 					service.status = "success";
-					/*boolean wasSent =*/ service.sendFollowUpMessage(nluResult.input, service.buildResult());
+					/*boolean wasSent =*/ service.sendFollowUpMessage(service.buildResult());
 					return;
 				}).getJson());
 			}
@@ -231,7 +231,7 @@ public class WorkoutHelperDemo implements ServiceInterface {
 				ServiceBuilder service = new ServiceBuilder(nluResult);
 				service.answer = Answers.getAnswerString(nluResult, followUpIntervalSeconds, seconds);
 				service.status = "success";
-				/*boolean wasSent =*/ service.sendFollowUpMessage(nluResult.input, service.buildResult());
+				/*boolean wasSent =*/ service.sendFollowUpMessage(service.buildResult());
 				return;
 			}).getJson());
 			
