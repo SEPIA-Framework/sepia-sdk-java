@@ -1,123 +1,120 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <groupId>net.b07z.sepia.sdk</groupId>
-  <artifactId>sepia-sdk-java</artifactId>
-  <version>0.9.23</version>
-  <name>SEPIA SDK</name>
-  <description>Tools to develop services for the SEPIA framework</description>
-  <url>https://sepia-framework.github.io</url>
-  <packaging>jar</packaging>
-  
-  <licenses>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.b07z.sepia.sdk</groupId>
+	<artifactId>sepia-sdk-java</artifactId>
+	<version>0.9.24</version>
+	<name>SEPIA SDK</name>
+	<description>Tools to develop services for the SEPIA framework</description>
+	<url>https://sepia-framework.github.io</url>
+	<packaging>jar</packaging>
+
+	<licenses>
 		<license>
 			<name>MIT License</name>
 			<url>http://www.opensource.org/licenses/mit-license.php</url>
 		</license>
-  </licenses>
-  
-  <properties>
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    	<maven.compiler.source>1.8</maven.compiler.source>
+	</licenses>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<java.version>1.8</java.version>
 		<kotlin.version>1.3.71</kotlin.version>
-  </properties>
-  
-  <dependencies>
-        <!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH OR LOCALLY INSTALLED ... 
-        <dependency>
-            <groupId>net.b07z.sepia.server.assist</groupId>
-			<artifactId>sepia-assist-API</artifactId>
-            <version>2.5.1</version>
-        </dependency> 
-        -->
-        
-        <!-- ... THIS IS WHAT WE USE FOR NOW  -->
-	    <dependency>
-	  		<groupId>com.sparkjava</groupId>
-	  		<artifactId>spark-core</artifactId>
-	  		<version>2.9.1</version>
-	  	</dependency>
+	</properties>
+
+	<dependencies>
+		<!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH OR LOCALLY INSTALLED ...
 		<dependency>
-	        <groupId>org.slf4j</groupId>
-	        <artifactId>slf4j-simple</artifactId>
-	        <version>1.7.21</version>
-	    </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.10.4</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>2.6</version>
-		</dependency>
-        <dependency>
-  			<groupId>commons-codec</groupId>
-  			<artifactId>commons-codec</artifactId>
-  			<version>1.10</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.googlecode.soundlibs</groupId>
-  			<artifactId>mp3spi</artifactId>
-  			<version>1.9.5.4</version>
-  		</dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
-        <dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		    <version>4.5.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpmime</artifactId>
-		    <version>4.5.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.owasp.encoder</groupId>
-		    <artifactId>encoder</artifactId>
-		    <version>1.2.2</version>
-		</dependency>
-		<dependency>
-  			<groupId>net.b07z.sepia.server.core</groupId>
-  			<artifactId>sepia-core-tools</artifactId>
-  			<version>2.2.7</version>
-  			<scope>system</scope>
-  			<systemPath>${basedir}/libs/sepia-core-tools-v2.2.7.jar</systemPath>
-		</dependency>
+			<groupId>net.b07z.sepia.server.assist</groupId>
+			<artifactId>sepia-assist-API</artifactId> 
+			<version>2.5.2</version>
+		</dependency> 
+		-->
 		
+		<!-- ... THIS IS WHAT WE USE FOR NOW -->
 		<dependency>
-            <groupId>com.j2html</groupId>
-            <artifactId>j2html</artifactId>
-            <version>0.88</version>
-        </dependency>
-        <dependency>
-    		<groupId>org.eclipse.paho</groupId>
-    		<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-    		<version>1.2.0</version> <!-- NOTE: we can't use 1.2.2 due to: https://github.com/eclipse/paho.mqtt.java/issues/572 -->
+			<groupId>com.sparkjava</groupId>
+			<artifactId>spark-core</artifactId>
+			<version>2.9.3</version>
 		</dependency>
 		<dependency>
-  			<groupId>net.b07z.sepia.websockets</groupId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>[2.10.5,2.10.6)</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.soundlibs</groupId>
+			<artifactId>mp3spi</artifactId>
+			<version>1.9.5.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>[4.5.13,4.6.0)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>[4.5.13,4.6.0)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.owasp.encoder</groupId>
+			<artifactId>encoder</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>net.b07z.sepia.server.core</groupId>
+			<artifactId>sepia-core-tools</artifactId>
+			<version>2.2.9</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/sepia-core-tools-v2.2.9.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>com.j2html</groupId>
+			<artifactId>j2html</artifactId>
+			<version>0.88</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.paho</groupId>
+			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+			<version>1.2.0</version> <!-- NOTE: we can't use 1.2.2 due to: https://github.com/eclipse/paho.mqtt.java/issues/572 -->
+		</dependency>
+		<dependency>
+			<groupId>net.b07z.sepia.websockets</groupId>
 			<artifactId>sepia-websockets</artifactId>
-			<version>1.3.1</version>
-  			<scope>system</scope>
-  			<systemPath>${basedir}/libs/sepia-chat-v1.3.1.jar</systemPath>
+			<version>1.3.2</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/sepia-chat-v1.3.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -128,42 +125,43 @@
 		<dependency>
 			<groupId>com.rometools</groupId>
 			<artifactId>rome</artifactId>
-			<version>1.12.0</version>
+			<version>1.12.2</version>
 		</dependency>
-    	<dependency>
-        	<groupId>org.jetbrains.kotlin</groupId>
-        	<artifactId>kotlin-stdlib-jdk8</artifactId>
-        	<version>${kotlin.version}</version>
-    	</dependency>
 		<dependency>
-  			<groupId>net.b07z.sepia.server.assist</groupId>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.b07z.sepia.server.assist</groupId>
 			<artifactId>sepia-assist-API</artifactId>
-			<version>2.5.1</version>
-  			<scope>system</scope>
-  			<systemPath>${basedir}/libs/sepia-assist-v2.5.1.jar</systemPath>
+			<version>2.5.2</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/libs/sepia-assist-v2.5.2.jar</systemPath>
 		</dependency>
 		<!-- -->
-		
-		<!-- NOTE: Java Docs for the SDK can be loaded via IDE (Java build path -> Libraries -> Maven dep. -> ... Javadoc location) -->
-		
+
+		<!-- NOTE: Java Docs for the SDK can be loaded via IDE (Java build path 
+			-> Libraries -> Maven dep. -> ... Javadoc location) -->
+
 		<!-- JUnit -->
 		<dependency>
-      		<groupId>junit</groupId>
-      		<artifactId>junit</artifactId>
-      		<version>4.13.1</version>
-      		<scope>test</scope>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.jetbrains.kotlin</groupId>
-		    <artifactId>kotlin-test</artifactId>
-		    <version>${kotlin.version}</version>
-		    <scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.jetbrains.kotlin</groupId>
-		    <artifactId>kotlin-test-junit</artifactId>
-		    <version>${kotlin.version}</version>
-		    <scope>test</scope>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-test</artifactId>
+			<version>${kotlin.version}</version>
+			<scope>test</scope>
 		</dependency>
-  </dependencies>      
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-test-junit</artifactId>
+			<version>${kotlin.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>
