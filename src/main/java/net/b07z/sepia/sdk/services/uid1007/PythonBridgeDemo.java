@@ -18,7 +18,10 @@ import net.b07z.sepia.server.core.data.Language;
 import net.b07z.sepia.server.core.tools.Sdk;
 
 /**
- * Demonstration of how to use SEPIA Python-Bridge to enhance NLU and services.
+ * Demonstration of how to use SEPIA Python-Bridge to enhance NLU and services.<br>
+ * <br>
+ * To use this service please make sure your Python-Bridge server is running:<br>
+ * https://github.com/SEPIA-Framework/sepia-python-bridge 
  * 
  * @author Florian Quirin
  *
@@ -35,10 +38,10 @@ public class PythonBridgeDemo implements ServiceInterface {
 		TreeSet<String> samples = new TreeSet<>();
 		//GERMAN
 		if (lang.equals(Language.DE.toValue())){
-			samples.add("Ich würde gerne die Python Brücke testen.");
+			samples.add("Python Brücke testen.");
 		//OTHER
 		}else{
-			samples.add("I'd like to test the Python bridge.");
+			samples.add("Test Python bridge.");
 		}
 		return samples;
 	}
