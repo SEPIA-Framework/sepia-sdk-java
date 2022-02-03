@@ -161,22 +161,21 @@ public class DynamicQuestionAnswering implements ServiceInterface {
 			
 			//TODO: Here you can add your scripts to answer the question. Write your own logic or maybe use a web API?
 			String questionResponse = "";
-			boolean answeredSuccessfully = false;
 			//Example HTTP call e.g. to a web API, your PythonBridge or any other micro-service with HTTP interface:
 			/*
 			try{
 				JSONObject response = Connectors.apacheHttpGETjson("http://localhost:20731/my-service/");
 				if (response != null && response.containsKey("answer")){
 					questionResponse = JSON.getString(response, "answer");
-					answeredSuccessfully = true;
 				}
 			}catch (Exception e){
-				e.printStackTrace();
+				Debugger.println("DynamicQuestionAnswering - failed to call API - Error: " + e.getMessage(), 1);
 			}
 			*/
 			//JUST FOR TESTING: return the question:
 			questionResponse = qRaw;
-			answeredSuccessfully = Is.notNullOrEmpty(questionResponse);		//implement your own checks depending on how you generate answers!
+			//TODO: Implement your own checks depending on how you generate answers!
+			boolean answeredSuccessfully = Is.notNullOrEmpty(questionResponse);
 						
 			//success or no answer?
 			if (!answeredSuccessfully){

@@ -119,7 +119,7 @@ public class PythonBridgeDemo implements ServiceInterface {
 		
 		//Parameters:
 		
-		//This service has a one required parameter, the code word.
+		//This service has one required parameter, the code word.
 		//Required parameters will be asked automatically by SEPIA using the defined question.
 		Parameter p1 = new Parameter(new CodeWord())
 				.setRequired(true)
@@ -161,6 +161,21 @@ public class PythonBridgeDemo implements ServiceInterface {
 		
 		// ... here you could put some code that runs after successful code word.
 		// wrong code will automatically lead to rejection before reaching this part ...
+		
+		//Example call to another PythonBridge endpoint (define yourself)
+		/*
+		String myReply = "";
+		try{
+			JSONObject response = Connectors.apacheHttpGETjson("http://localhost:20731/my-service/");
+			if (response != null && response.containsKey("myReply")){
+				myReply = JSON.getString(response, "myReply");
+				...
+			}
+		}catch (Exception e){
+			Debugger.println("PythonBridgeDemo - failed to call API - Error: " + e.getMessage(), 1);
+		}
+		if (Is.notNullOrEmpty(myReply)){ ... }
+		*/
 				
 		//all good
 		api.setStatusSuccess();
