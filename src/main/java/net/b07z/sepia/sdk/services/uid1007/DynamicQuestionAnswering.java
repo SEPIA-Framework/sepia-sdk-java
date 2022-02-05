@@ -7,7 +7,7 @@ import net.b07z.sepia.server.assist.assistant.LANGUAGES;
 import net.b07z.sepia.server.assist.data.Parameter;
 import net.b07z.sepia.server.assist.interpreters.NluResult;
 import net.b07z.sepia.server.assist.interviews.InterviewData;
-import net.b07z.sepia.server.assist.parameters.GenericEmptyParameter;
+import net.b07z.sepia.server.assist.parameters.CustomParameter;
 import net.b07z.sepia.server.assist.services.ServiceBuilder;
 import net.b07z.sepia.server.assist.services.ServiceInfo;
 import net.b07z.sepia.server.assist.services.ServiceInterface;
@@ -110,8 +110,8 @@ public class DynamicQuestionAnswering implements ServiceInterface {
 		
 		//Parameters:
 		
-		//This service has no fixed parameter. The question is instead generated dynamically inside the result handler.
-		//We still need to define the custom parameter as optional though to extract it properly later:
+		//This service has no required parameter because the question is generated dynamically inside the result handler.
+		//We define the custom parameter as optional though to extract it properly later (or in regular expression trigger):
 		Parameter p1 = new Parameter(new SpecialQuestion());
 		info.addParameter(p1);
 		
@@ -198,8 +198,17 @@ public class DynamicQuestionAnswering implements ServiceInterface {
 	//----------------- custom parameters -------------------
 	
 	/**
-	 * Parameter handler that is just a placeholder for our custom question.
-	 * It will contain the full input, normalized and raw if used in a response.
+	 * Custom parameter that tries to extract the question from first input or response.
+	 * It will contain the normalized and full raw input by default.
 	 */
-	public static class SpecialQuestion extends GenericEmptyParameter {}
+	public static class SpecialQuestion extends CustomParameter {
+		
+		@Override
+		public String extract(String input){
+			//If you use regular expression triggers in 'getInfo' you could try to extract
+			//the question here. For now we just return nothing and get the input during
+			//response phase (after "what do you want to know?")
+			return "";
+		}
+	}
 }
