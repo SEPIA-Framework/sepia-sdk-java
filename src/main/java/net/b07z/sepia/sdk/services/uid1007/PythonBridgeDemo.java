@@ -18,7 +18,10 @@ import net.b07z.sepia.server.core.data.Language;
 import net.b07z.sepia.server.core.tools.Sdk;
 
 /**
- * Demonstration of how to use SEPIA Python-Bridge to enhance NLU and services.
+ * Demonstration of how to use SEPIA Python-Bridge to enhance NLU and services.<br>
+ * <br>
+ * To use this service please make sure your Python-Bridge server is running:<br>
+ * https://github.com/SEPIA-Framework/sepia-python-bridge 
  * 
  * @author Florian Quirin
  *
@@ -35,10 +38,10 @@ public class PythonBridgeDemo implements ServiceInterface {
 		TreeSet<String> samples = new TreeSet<>();
 		//GERMAN
 		if (lang.equals(Language.DE.toValue())){
-			samples.add("Ich würde gerne die Python Brücke testen.");
+			samples.add("Python Brücke testen.");
 		//OTHER
 		}else{
-			samples.add("I'd like to test the Python bridge.");
+			samples.add("Test Python bridge.");
 		}
 		return samples;
 	}
@@ -116,7 +119,7 @@ public class PythonBridgeDemo implements ServiceInterface {
 		
 		//Parameters:
 		
-		//This service has a one required parameter, the code word.
+		//This service has one required parameter, the code word.
 		//Required parameters will be asked automatically by SEPIA using the defined question.
 		Parameter p1 = new Parameter(new CodeWord())
 				.setRequired(true)
@@ -158,6 +161,21 @@ public class PythonBridgeDemo implements ServiceInterface {
 		
 		// ... here you could put some code that runs after successful code word.
 		// wrong code will automatically lead to rejection before reaching this part ...
+		
+		//Example call to another PythonBridge endpoint (define yourself)
+		/*
+		String myReply = "";
+		try{
+			JSONObject response = Connectors.apacheHttpGETjson("http://localhost:20731/my-service/");
+			if (response != null && response.containsKey("myReply")){
+				myReply = JSON.getString(response, "myReply");
+				...
+			}
+		}catch (Exception e){
+			Debugger.println("PythonBridgeDemo - failed to call API - Error: " + e.getMessage(), 1);
+		}
+		if (Is.notNullOrEmpty(myReply)){ ... }
+		*/
 				
 		//all good
 		api.setStatusSuccess();
