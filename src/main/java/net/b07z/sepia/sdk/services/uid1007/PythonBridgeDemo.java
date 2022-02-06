@@ -165,8 +165,12 @@ public class PythonBridgeDemo implements ServiceInterface {
 		//Example call to another PythonBridge endpoint (define yourself)
 		/*
 		String myReply = "";
+		String myQuestion = "my question";
 		try{
-			JSONObject response = Connectors.apacheHttpGETjson("http://localhost:20731/my-service/");
+			String qUrlParam = "?q=" + URLEncoder.encode(myQuestion, "UTF-8");
+			JSONObject response = Connectors.apacheHttpGETjson(
+				"http://localhost:20731/my-service/" + qUrlParam
+			);
 			if (response != null && response.containsKey("myReply")){
 				myReply = JSON.getString(response, "myReply");
 				...
