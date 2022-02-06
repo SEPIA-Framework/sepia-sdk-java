@@ -168,7 +168,7 @@ public class PythonBridgeDemo implements ServiceInterface {
 		String myQuestion = "my question";
 		try{
 			String qUrlParam = "?q=" + URLEncoder.encode(myQuestion, "UTF-8");
-			JSONObject response = Connectors.apacheHttpGETjson(
+			JSONObject response = Connectors.simpleJsonGet(
 				"http://localhost:20731/my-service/" + qUrlParam
 			);
 			if (response != null && response.containsKey("myReply")){

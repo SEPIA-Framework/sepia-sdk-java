@@ -165,7 +165,7 @@ public class DynamicQuestionAnswering implements ServiceInterface {
 			/*
 			try{
 				String qUrlParam = "?q=" + URLEncoder.encode(qRaw, "UTF-8");
-				JSONObject response = Connectors.apacheHttpGETjson(
+				JSONObject response = Connectors.simpleJsonGet(
 					"http://localhost:20731/my-service/" + qUrlParam
 				);
 				if (response != null && response.containsKey("answer")){
