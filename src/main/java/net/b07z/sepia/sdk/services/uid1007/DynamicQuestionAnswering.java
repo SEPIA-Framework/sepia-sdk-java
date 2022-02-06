@@ -164,7 +164,10 @@ public class DynamicQuestionAnswering implements ServiceInterface {
 			//Example HTTP call e.g. to a web API, your PythonBridge or any other micro-service with HTTP interface:
 			/*
 			try{
-				JSONObject response = Connectors.apacheHttpGETjson("http://localhost:20731/my-service/");
+				String qUrlParam = "?q=" + URLEncoder.encode(qRaw, "UTF-8");
+				JSONObject response = Connectors.apacheHttpGETjson(
+					"http://localhost:20731/my-service/" + qUrlParam
+				);
 				if (response != null && response.containsKey("answer")){
 					questionResponse = JSON.getString(response, "answer");
 				}
