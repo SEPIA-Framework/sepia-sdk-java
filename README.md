@@ -14,6 +14,7 @@ You can use the 'Code-UI' page of the Control-HUB to edit and upload services cr
 
 ## Quickstart
 - Import the maven project into the IDE of your choice (tested with Eclipse).
+- Run `mvn clean` and `mvn install` once to make sure SEPIA libraries are available in Java classpath
 - Make sure you've installed a JAVA JDK on the S.E.P.I.A. server (e.g.: `sudo apt-get install -y openjdk-11-jdk-headless`). This is required to compile new classes during runtime.
 - Create a package for your developer account ID under 'net.b07z.sepia.sdk.services' (e.g. "uid1010" -> net.b07z.sepia.sdk.services.uid1010).
 - Open 'Settings/sdk.properties' and put in your credentials (ID + password of your SEPIA account with 'developer' role) and the endpoint URL of your SEPIA-Assist server.
