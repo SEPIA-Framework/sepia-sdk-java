@@ -24,18 +24,81 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<java.version>11</java.version>
 		<kotlin.version>1.5.32</kotlin.version>
+		<sepia.core-tools-v>2.3.0</sepia.core-tools-v>
+		<sepia.chat-server-v>1.4.0</sepia.chat-server-v>
+		<sepia.assist-server-v>2.7.0</sepia.assist-server-v>
 	</properties>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>install-core-tools-jar</id>
+						<phase>clean</phase>
+						<configuration>
+							<repositoryLayout>default</repositoryLayout>
+							<groupId>net.b07z.sepia.server.core</groupId>
+							<artifactId>sepia-core-tools</artifactId>
+							<version>${sepia.core-tools-v}</version>
+							<file>${basedir}/libs/sepia-core-tools-v${sepia.core-tools-v}.jar</file>
+							<packaging>jar</packaging>
+							<generatePom>true</generatePom>
+						</configuration>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>install-chat-server-jar</id>
+						<phase>clean</phase>
+						<configuration>
+							<repositoryLayout>default</repositoryLayout>
+							<groupId>net.b07z.sepia.websockets</groupId>
+							<artifactId>sepia-websockets</artifactId>
+							<version>${sepia.chat-server-v}</version>
+							<file>${basedir}/libs/sepia-chat-v${sepia.chat-server-v}.jar</file>
+							<packaging>jar</packaging>
+							<generatePom>true</generatePom>
+						</configuration>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>install-assist-server-jar</id>
+						<phase>clean</phase>
+						<configuration>
+							<repositoryLayout>default</repositoryLayout>
+							<groupId>net.b07z.sepia.server.assist</groupId>
+							<artifactId>sepia-assist-API</artifactId>
+							<version>${sepia.assist-server-v}</version>
+							<file>${basedir}/libs/sepia-assist-v${sepia.assist-server-v}.jar</file>
+							<packaging>jar</packaging>
+							<generatePom>true</generatePom>
+						</configuration>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
-		<!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH OR LOCALLY INSTALLED ... -->
+		<!-- THIS IS WHAT WE USE WHEN THE REPOS ARE ON OSSH OR LOCALLY INSTALLED ...
 		<dependency>
 			<groupId>net.b07z.sepia.server.assist</groupId>
 			<artifactId>sepia-assist-API</artifactId> 
-			<version>2.7.0</version>
+			<version>${sepia.assist-server-v}</version>
 		</dependency> 
-		<!-- -->
+		-->
 		
-		<!-- ... THIS IS WHAT WE USE FOR NOW 
+		<!-- ... THIS IS WHAT WE USE FOR NOW --> 
 		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-core</artifactId>
@@ -99,9 +162,7 @@
 		<dependency>
 			<groupId>net.b07z.sepia.server.core</groupId>
 			<artifactId>sepia-core-tools</artifactId>
-			<version>2.3.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/libs/sepia-core-tools-v2.3.0.jar</systemPath>
+			<version>${sepia.core-tools-v}</version>
 		</dependency>
 
 		<dependency>
@@ -117,9 +178,7 @@
 		<dependency>
 			<groupId>net.b07z.sepia.websockets</groupId>
 			<artifactId>sepia-websockets</artifactId>
-			<version>1.4.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/libs/sepia-chat-v1.4.0.jar</systemPath>
+			<version>${sepia.chat-server-v}</version>
 		</dependency>
 
 		<dependency>
@@ -145,11 +204,9 @@
 		<dependency>
 			<groupId>net.b07z.sepia.server.assist</groupId>
 			<artifactId>sepia-assist-API</artifactId>
-			<version>2.7.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/libs/sepia-assist-v2.7.0.jar</systemPath>
+			<version>${sepia.assist-server-v}</version>
 		</dependency>
-		-->
+		<!-- -->
 
 		<!-- NOTE: Java Docs for the SDK can be loaded via IDE (Java build path 
 			-> Libraries -> Maven dep. -> ... Javadoc location) -->
