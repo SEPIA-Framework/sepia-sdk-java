@@ -195,7 +195,7 @@ public class RestaurantDemo implements ServiceInterface {
 		String timeDate = day + " " + time;
 		if (api.language.equals(LANGUAGES.EN)){
 			timeDate = DateTimeConverters.getSpeakableDate(day, "yyyy.MM.dd", api.language)
-				+ " at " + DateTimeConverters.convertDateFormat(time, "HH:mm:ss", "h:mm a");
+				+ " at " + DateTimeConverters.convertDateFormat(time, "HH:mm:ss", "h:mm a", api.language);
 		}
 		
 		//-number
