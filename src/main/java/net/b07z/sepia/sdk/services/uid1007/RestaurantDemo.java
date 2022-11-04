@@ -17,6 +17,7 @@ import net.b07z.sepia.server.assist.services.ServiceAccessManager;
 import net.b07z.sepia.server.assist.services.ServiceBuilder;
 import net.b07z.sepia.server.assist.services.ServiceInfo;
 import net.b07z.sepia.server.assist.services.ServiceInterface;
+import net.b07z.sepia.server.assist.services.ServiceRequirements;
 import net.b07z.sepia.server.assist.services.ServiceResult;
 import net.b07z.sepia.server.assist.tools.DateTimeConverters;
 import net.b07z.sepia.server.assist.users.ACCOUNT;
@@ -30,7 +31,9 @@ import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.Sdk;
 
 /**
- * Demo for a restaurant reservation service.
+ * Demo for a restaurant reservation service.<br>
+ * <br>
+ * 2022.11.01 - NOTE: The service has been updated and requires v2.7.0 now
  * 
  * @author Florian Quirin
  *
@@ -39,6 +42,11 @@ public class RestaurantDemo implements ServiceInterface {
 	
 	//Command name of your service (will be combined with userId to be unique)
 	private static final String CMD_NAME = "restaurant_reservation";
+	
+  	@Override
+	public ServiceRequirements getRequirements(){
+		return new ServiceRequirements().serverMinVersion("2.7.0");
+	}
 	
 	//Define some sentences for testing:
 	
@@ -195,7 +203,7 @@ public class RestaurantDemo implements ServiceInterface {
 		String timeDate = day + " " + time;
 		if (api.language.equals(LANGUAGES.EN)){
 			timeDate = DateTimeConverters.getSpeakableDate(day, "yyyy.MM.dd", api.language)
-				+ " at " + DateTimeConverters.convertDateFormat(time, "HH:mm:ss", "h:mm a");
+				+ " at " + DateTimeConverters.convertDateFormat(time, "HH:mm:ss", "h:mm a", api.language);
 		}
 		
 		//-number
