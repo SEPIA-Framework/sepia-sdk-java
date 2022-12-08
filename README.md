@@ -5,12 +5,17 @@ A set of tools and classes to develop services for SEPIA in Java.
 Create an account on the SEPIA server you want to develop for.
 Ask the admin to add the 'developer' role to the account (see [Wiki](https://github.com/SEPIA-Framework/sepia-docs/wiki/Create-and-Edit-Users) for help).
 
-## Service upload interface
+## Service upload
+
+### Upload Server API
 The SEPIA-Assist server has an endpoint for service uploads, e.g.: http://localhost:20721/upload-service  
 To use the interface make sure the server has SDK support enabled (via [Control-HUB](https://github.com/SEPIA-Framework/sepia-admin-tools/tree/master/admin-web-tools) or enable_sdk=true in assist.*.properties).  
 
-## Service upload via Control-HUB
+### Upload via Control-HUB
 You can use the 'Code-UI' page of the Control-HUB to edit and upload services created with the SDK. See the [SEPIA extensions](https://github.com/SEPIA-Framework/sepia-extensions) repository for more info.
+
+### Good to know
+Services that have been uploaded are only available for the user that uploaded them unless you set 'info.makePublic()' in the code and upload them with the **'assistant' user** (core-account, usually uid1005).
 
 ## Quickstart
 - Import the maven project into the IDE of your choice (tested with Eclipse).
@@ -32,5 +37,12 @@ You can load them in your favorite IDE via the build-path properties. In Eclipse
 - Choose "Javadoc in archive" -> "Workspace file" and add `sepia-sdk-java/libs/sepia-assist-vX.Y.Z-javadoc.jar`
 - Click "Apply and close" and repeat the steps for the other SEPIA JAR files
 
-## Good to know
-Services that have been uploaded are only available for the user that uploaded them unless you set 'info.makePublic()' in the code and upload them with the **'assistant' user** (core-account, usually uid1005).
+### Add own dependencies to a service
+
+During server start the Java classpath is populated with the specific .jar files listed inside the main jar manifest. To load custom .jar files you can do the following:
+- Shutdown your SEPIA server then go to your `[SEPIA]/sepia-assist-server/` folder and look for the `run.sh`
+- Replace the last line with this: `nohup java -cp "$JAR_NAME:libs/*" net.b07z.sepia.server.assist.server.Start --my &> log.out&`
+- Then place your .jar file inside `[SEPIA]/sepia-assist-server/libs/` and it should be available after restart
+- The modified run command will load ALL .jar files from the libs folder instead of just the ones mentioned in the original manifest
+
+There is a theoretical option of loading the .jar file dynamically inside your smart-service with the `SandboxClassLoader`, but this hasn't been tested yet and is missing a proper interface.
